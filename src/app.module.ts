@@ -1,0 +1,21 @@
+import { Module } from '@nestjs/common';
+import { AuthenticationModule } from './authentication/authentication.module';
+import { BoxStepsModule } from './box-steps/box-steps.module';
+import { BoxesModule } from './boxes/boxes.module';
+import { CardsModule } from './cards/cards.module';
+import { TagsModule } from './tags/tags.module';
+import { UsersModule } from './users/users.module';
+
+@Module({
+  imports: [
+    AuthenticationModule,
+    BoxStepsModule,
+    BoxesModule,
+    CardsModule,
+    TagsModule,
+    UsersModule,
+  ],
+  controllers: [],
+  providers: [],
+})
+export class AppModule {}

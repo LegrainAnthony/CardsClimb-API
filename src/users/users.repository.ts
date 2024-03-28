@@ -13,13 +13,14 @@ export class UserRepository {
     });
   }
 
-  findOne(userWhereUniqueInput: Prisma.UserWhereUniqueInput) {
-    return this.prismaService.user.findUnique({
+  findOne(userWhereUniqueInput: Prisma.UserWhereInput, withPassword = false) {
+    return this.prismaService.user.findFirst({
       where: userWhereUniqueInput,
       select: {
         id: true,
         email: true,
         username: true,
+        hashedPassword: withPassword,
       },
     });
   }

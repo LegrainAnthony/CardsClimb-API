@@ -11,7 +11,7 @@ model User {
     id Int @default(autoincrement()) @id
     username String
     email String
-    hashedPassword String
+    hashed_password String
     boxes Box[]
     cards Card[]
 }

@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { TagRepository } from './tags.repository';
 import { Prisma } from '@prisma/client';
+import { CreateTagDto } from './dto/create-tag.dto';
 
 @Injectable()
 export class TagsService {
@@ -14,8 +15,15 @@ export class TagsService {
     return this.tagRepository.findOne({ id });
   }
 
-  create(data: Prisma.TagCreateInput) {
-    return this.tagRepository.create(data);
+  create(data: CreateTagDto) {
+    return this.tagRepository.create({
+      name: data.name,
+      color: {
+        connect: {
+          id: data.color_id,
+        },
+      },
+    });
   }
 
   update(id: number, data: Prisma.TagUpdateInput) {

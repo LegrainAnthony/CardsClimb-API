@@ -1,12 +1,4 @@
-import { Prisma } from '@prisma/client';
-import { IsArray, IsNumber, IsString } from 'class-validator';
+import { CreateTagDto } from './create-tag.dto';
+import { PartialType } from '@nestjs/mapped-types';
 
-export class UpdateTagDto {
-  @IsString()
-  name: string;
-
-  @IsNumber()
-  color_id: number;
-  
-  color: Prisma.ColorUpdateOneRequiredWithoutTagsNestedInput;
-}
+export class UpdateTagDto extends PartialType(CreateTagDto) {}

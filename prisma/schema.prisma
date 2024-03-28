@@ -13,6 +13,7 @@ model User {
     email String
     hashedPassword String
     boxes Box[]
+    cards Card[]
 }
 
 model Box {
@@ -20,13 +21,50 @@ model Box {
     name String
     user User @relation(fields: [userId], references: [id])
     userId Int
+    boxSteps BoxStep[]
+    cards Card[]
 }
 
 model Card {
     id Int @default(autoincrement()) @id
     ref  String
     question String
-    answer String
+    answer String?
     last_revision DateTime?
     future_revision DateTime
+    user User @relation(fields: [userId], references: [id])
+    userId Int
+    box Box @relation(fields: [boxId], references: [id])
+    boxId Int
+    cardType CardType @relation(fields: [cardTypeId], references: [id])
+    cardTypeId Int
+    tags Tag[]
+}
+
+model Tag {
+    id Int @default(autoincrement()) @id
+    name String
+    color Color @relation(fields: [colorId], references: [id])
+    colorId Int
+    cards Card[]
+}
+
+model CardType {
+    id Int @default(autoincrement()) @id
+    name String
+    cards Card[]
+}
+
+model BoxStep {
+    id Int @default(autoincrement()) @id
+    interval Int
+    box Box @relation(fields: [boxId], references: [id])
+    boxId Int
+}
+
+model Color {
+    id Int @default(autoincrement()) @id
+    name String
+    hex String
+    tags Tag[]
 }

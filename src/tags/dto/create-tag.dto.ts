@@ -1,10 +1,5 @@
 import { Prisma } from '@prisma/client';
-import {
-  IsNotEmpty,
-  IsNumber,
-  IsString,
-  IsStrongPassword,
-} from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateTagDto {
   @IsString()
@@ -13,6 +8,4 @@ export class CreateTagDto {
 
   @IsNotEmpty()
   color: Prisma.ColorCreateNestedOneWithoutTagsInput;
-
-
 }

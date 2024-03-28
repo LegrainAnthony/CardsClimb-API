@@ -11,7 +11,7 @@ model User {
     id Int @default(autoincrement()) @id
     username String
     email String
-    hashedPassword String
+    hashed_password String
     boxes Box[]
     cards Card[]
 }
@@ -19,33 +19,33 @@ model User {
 model Box {
     id Int @default(autoincrement()) @id
     name String
-    user User @relation(fields: [userId], references: [id])
-    userId Int
-    boxSteps BoxStep[]
+    user User @relation(fields: [user_id], references: [id])
+    user_id Int
+    box_steps BoxStep[]
     cards Card[]
 }
 
 model Card {
     id Int @default(autoincrement()) @id
-    ref  String
+    reference  String
     question String
     answer String?
     last_revision DateTime?
-    future_revision DateTime
-    user User @relation(fields: [userId], references: [id])
-    userId Int
-    box Box @relation(fields: [boxId], references: [id])
-    boxId Int
-    cardType CardType @relation(fields: [cardTypeId], references: [id])
-    cardTypeId Int
+    future_revision DateTime?
+    user User @relation(fields: [user_id], references: [id])
+    user_id Int
+    box Box? @relation(fields: [box_id], references: [id])
+    box_id Int?
+    card_type CardType @relation(fields: [card_type_id], references: [id])
+    card_type_id Int
     tags Tag[]
 }
 
 model Tag {
     id Int @default(autoincrement()) @id
     name String
-    color Color @relation(fields: [colorId], references: [id])
-    colorId Int
+    color Color @relation(fields: [color_id], references: [id])
+    color_id Int
     cards Card[]
 }
 
@@ -58,8 +58,8 @@ model CardType {
 model BoxStep {
     id Int @default(autoincrement()) @id
     interval Int
-    box Box @relation(fields: [boxId], references: [id])
-    boxId Int
+    box Box @relation(fields: [box_id], references: [id])
+    box_id Int
 }
 
 model Color {

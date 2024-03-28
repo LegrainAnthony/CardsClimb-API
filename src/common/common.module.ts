@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
-import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_GUARD } from '@nestjs/core';
 import { AuthTokenGuard } from './guards/auth-token.guard';
-import { JwtInterceptor } from './interceptors/jwt.interceptor';
 import { ConfigModule } from '@nestjs/config';
 
 @Module({
@@ -10,10 +9,6 @@ import { ConfigModule } from '@nestjs/config';
     {
       provide: APP_GUARD,
       useClass: AuthTokenGuard,
-    },
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: JwtInterceptor,
     },
   ],
   exports: [],

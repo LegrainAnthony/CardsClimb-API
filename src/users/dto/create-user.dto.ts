@@ -16,8 +16,8 @@ export class CreateUserDto {
 
   @IsString()
   @IsNotEmpty()
-  @IsStrongPassword({
-    minLength: 12,
-  })
-  hashedPassword: string;
+  // @IsStrongPassword({
+  //   minLength: 12,
+  // })
+  hashed_password: string;
 }

@@ -4,9 +4,11 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { SignUp, signIn } from './interfaces/signIn.interface';
+import { SignUp, signIn } from './interfaces/auth.interface';
 import { hash, compare } from 'bcrypt';
 import { UserRepository } from 'src/users/users.repository';
+
+const SALT = 10;
 
 @Injectable()
 export class AuthenticationService {
@@ -24,12 +26,12 @@ export class AuthenticationService {
       throw new UnauthorizedException('User already exists');
     }
 
-    const hashedPassword = await hash(user.password, 10);
+    const hashedPassword = await hash(user.password, SALT);
 
     const userCreated = await this.userRepository.create({
       username: user.username,
       email: user.email,
-      hashedPassword,
+      hashed_password: hashedPassword,
     });
 
     const payload = { username: userCreated.username, sub: userCreated.id };
@@ -51,7 +53,7 @@ export class AuthenticationService {
 
     const isPasswordValid = await compare(
       user.password,
-      userFound.hashedPassword,
+      userFound.hashed_password,
     );
 
     if (!isPasswordValid) {

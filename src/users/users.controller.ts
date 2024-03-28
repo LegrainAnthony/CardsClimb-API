@@ -1,11 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  ParseIntPipe,
-  Post,
-} from '@nestjs/common';
+import { Controller, Get, Param, ParseIntPipe } from '@nestjs/common';
 import { UsersService } from './users.service';
 
 // The @Controller() decorator takes a string argument that defines the route for the controller.
@@ -17,11 +10,5 @@ export class UsersController {
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.usersService.findOne(id);
-  }
-
-  // The DTO class is used to define the shape of the data that the client should send to the server.
-  @Post()
-  create(@Body() user: any) {
-    return this.usersService.create(user);
   }
 }

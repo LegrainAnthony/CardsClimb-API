@@ -17,4 +17,11 @@ export class CardsRepository {
         where: cardWHereUniqueInput,
     })
   }
+
+  udpateOne(cardWhereUniqueInput: Prisma.CardWhereUniqueInput, datas: UpdateCardData  ) {
+    return this.prismaService.card.update({
+      where: cardWhereUniqueInput,
+      data: datas
+    })
+  }
 }

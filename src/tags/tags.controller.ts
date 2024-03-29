@@ -3,10 +3,11 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
-  Put,
 } from '@nestjs/common';
 import { TagsService } from './tags.service';
 import { CreateTagDto } from './dto/create-tag.dto';
@@ -31,13 +32,14 @@ export class TagsController {
     return this.tagService.create(tag);
   }
 
-  @Put(':id')
+  @Patch(':id')
   update(@Param('id', ParseIntPipe) id: number, @Body() tag: UpdateTagDto) {
     return this.tagService.update(id, tag);
   }
 
   @Delete(':id')
+  @HttpCode(204)
   delete(@Param('id', ParseIntPipe) id: number) {
-    return this.tagService.delete(id);
+    this.tagService.delete(id);
   }
 }

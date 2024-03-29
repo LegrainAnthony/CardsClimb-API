@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Box, Prisma } from '@prisma/client';
 import { PrismaService } from 'src/db/prisma.service';
+import { CreateBoxDto } from './dto/create-boxes.dto';
 
 @Injectable()
-export class BoxRepository {
+export class BoxesRepository {
   constructor(private readonly prismaService: PrismaService) {}
 
   create(box: Prisma.BoxCreateInput) {
@@ -12,36 +13,31 @@ export class BoxRepository {
     });
   }
 
-  findOne(boxWhereUniqueInput: Prisma.BoxWhereUniqueInput) {
+  findOne(BoxWhereUniqueInput: Prisma.BoxWhereUniqueInput) {
     return this.prismaService.box.findUnique({
-      where: boxWhereUniqueInput,
-      select: {
-        id: true,
-        name: true,
-        user_id: true,
-      },
+      where: BoxWhereUniqueInput,
     });
   }
 
-  findAll(where: Prisma.BoxWhereInput) {
-    return this.prismaService.box.findMany({
-      where: where,
-    });
-  }
-
-  update(
-    boxWhereUniqueInput: Prisma.BoxWhereUniqueInput,
+  updateOne(
+    BoxWhereUniqueInput: Prisma.BoxWhereUniqueInput,
     data: Prisma.BoxUpdateInput,
   ) {
     return this.prismaService.box.update({
-      where: boxWhereUniqueInput,
+      where: BoxWhereUniqueInput,
       data: data,
     });
   }
 
-  delete(boxWhereUniqueInput: Prisma.BoxWhereUniqueInput) {
+  deleteOne(BoxWhereUniqueInput: Prisma.BoxWhereUniqueInput) {
     return this.prismaService.box.delete({
-      where: boxWhereUniqueInput,
+      where: BoxWhereUniqueInput,
+    });
+  }
+
+  async findAllBoxes(where: Prisma.BoxWhereInput): Promise<Box[]> {
+    return this.prismaService.box.findMany({
+      where,
     });
   }
 }

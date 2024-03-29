@@ -4,10 +4,4 @@ export class CreateBoxDto {
   @IsNotEmpty()
   @IsString()
   name: string;
-
-  user: Prisma.UserCreateNestedOneWithoutBoxesInput;
-
-  @IsNotEmpty()
-  @IsInt()
-  user_id: number;
 }

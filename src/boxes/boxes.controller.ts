@@ -4,43 +4,49 @@ import {
   Delete,
   Get,
   Param,
-  Patch,
   ParseIntPipe,
+  Patch,
   Post,
+  Query,
+  UseInterceptors,
 } from '@nestjs/common';
 import { BoxesService } from './boxes.service';
 import { CreateBoxDto } from './dto/create-boxes.dto';
 import { UpdateBoxDto } from './dto/update-boxes.dto';
+import { prismaClientHandler } from 'src/common/interceptor/prisma-client-handler.interceptor';
+import { UserId } from 'src/common/decorators/user-id.decorator';
 
 @Controller('boxes')
+@UseInterceptors(prismaClientHandler)
 export class BoxesController {
   constructor(private readonly boxesService: BoxesService) {}
 
-  @Post()
-  create(@Body() box: CreateBoxDto) {
-    return this.boxesService.create(box);
-  }
-
-  @Get()
-  findAll() {
-    return this.boxesService.findAll();
-  }
-
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.boxesService.findOne(id);
+  findOne(@Param('id', ParseIntPipe) id: number, @UserId() userId: number) {
+    return this.boxesService.findOneBox(id, userId);
+  }
+
+  @Post()
+  create(@Body() box: CreateBoxDto, @UserId() userId: number) {
+    return this.boxesService.createBox(box, userId);
   }
 
   @Patch(':id')
-  update(
+  updateBox(
+    @Body() data: UpdateBoxDto,
     @Param('id', ParseIntPipe) id: number,
-    @Body() updateBoxDto: UpdateBoxDto,
+    @UserId() UserId: number,
   ) {
-    return this.boxesService.update(id, updateBoxDto);
+    return this.boxesService.updateBox(id, UserId, data);
   }
 
   @Delete(':id')
-  delete(@Param('id', ParseIntPipe) id: number) {
-    return this.boxesService.delete(id);
+  delete(@Param('id', ParseIntPipe) id: number, @UserId() UserId: number) {
+    return this.boxesService.deleteBox(id, UserId);
+  }
+
+  @Get()
+  findAllBoxes(@UserId() UserId: number) {
+    return this.boxesService.findAllBoxes(UserId);
   }
 }

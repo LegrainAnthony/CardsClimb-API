@@ -1,28 +1,58 @@
-import { Injectable } from '@nestjs/common';
-import { BoxRepository } from './boxes.repository';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
+import { BoxesRepository } from './boxes.repository';
 import { Prisma } from '@prisma/client';
+import { CreateBoxDto } from './dto/create-boxes.dto';
+import { UpdateBoxDto } from './dto/update-boxes.dto';
 
 @Injectable()
 export class BoxesService {
-  constructor(private readonly boxRepository: BoxRepository) {}
+  constructor(private readonly boxRepository: BoxesRepository) {}
 
-  create(data: Prisma.BoxCreateInput) {
-    return this.boxRepository.create(data);
+  createBox(data: CreateBoxDto, userId: number) {
+    return this.boxRepository.create({
+      ...data,
+      user: { connect: { id: userId } },
+    });
   }
 
-  findOne(id: number) {
-    return this.boxRepository.findOne({ id });
+  async findOneBox(id: number, userId: number) {
+    const box = await this.boxRepository.findOne({ id });
+
+    if (!box) {
+      throw new BadRequestException();
+    }
+    if (box.user_id !== userId) {
+      throw new ForbiddenException();
+    }
+    return box;
   }
 
-  findAll() {
-    return this.boxRepository.findAll({});
+  async updateBox(id: number, userId: number, data: UpdateBoxDto) {
+    try {
+      await this.findOneBox(id, userId);
+
+      return this.boxRepository.updateOne({ id }, { name: data.name });
+    } catch (err) {
+      throw err;
+    }
   }
 
-  update(id: number, data: Prisma.BoxUpdateInput) {
-    return this.boxRepository.update({ id }, data);
+  async deleteBox(id: number, userId: number) {
+    try {
+      await this.findOneBox(id, userId);
+      return this.boxRepository.deleteOne({ id });
+    } catch (err) {
+      throw err;
+    }
   }
 
-  delete(id: number) {
-    return this.boxRepository.delete({ id });
+  async findAllBoxes(userId: number) {
+    return this.boxRepository.findAllBoxes({
+      user_id: userId,
+    });
   }
 }

@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { ForbiddenException, HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CardsRepository } from './cards.repository';
 import { Prisma } from '@prisma/client';
 import { CreateCardDto } from './dto/create-card.dto';
@@ -13,21 +13,21 @@ export class CardsService {
         return await this.userRepository.findOne({ id: 1 })
     }
 
-    async createCard(data: CreateCardDto, cardTypeId: string) {
-        const user = await this.getConnectedUser()
+    async createCard(data: CreateCardDto, cardTypeId: string, userId: number) {
         //! Inclure vérificatioon des card_type
         return this.cardsRepository.create({
             ...data,
-            user: { connect: { id: user.id } },
+            user: { connect: { id: userId } },
             card_type: { connect: { id: Number(cardTypeId) } }
         })
     }
 
-    async findOneCard(id: number) {
+    async findOneCard(id: number, userId: number) {
+        console.log(userId);
         const card = await this.cardsRepository.findOne({id});
-        const user = await  this.getConnectedUser();
-        if(card.user_id !== user.id) {
-            throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
+        // const user = await  this.getConnectedUser();
+        if(card.user_id !== userId) {
+            throw new ForbiddenException();
         }
         return card;
     }

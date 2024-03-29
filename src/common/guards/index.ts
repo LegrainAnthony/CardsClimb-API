@@ -1,1 +1,1 @@
-export { AuthTokenGuard } from "./auth-token.guard"
+export { AuthTokenGuard } from './auth-token.guard';

@@ -50,7 +50,7 @@ export class AuthTokenGuard implements CanActivate {
       response.setHeader('X-Refresh-Token', token);
     }
 
-    request.user = decodedToken
+    request.user = decodedToken;
 
     return true;
   }

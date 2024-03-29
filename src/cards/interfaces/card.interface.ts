@@ -1,5 +1,5 @@
 interface UpdateCardData {
-    question: string;
-    answer: string;
-    reference: string;
+  question: string;
+  answer: string;
+  reference: string;
 }

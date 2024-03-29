@@ -1,1 +1,1 @@
-export { prismaClientHandler } from "./prisma-client-handler.interceptor"
+export { prismaClientHandler } from './prisma-client-handler.interceptor';

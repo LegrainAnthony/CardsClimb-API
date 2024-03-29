@@ -12,6 +12,8 @@ async function bootstrap() {
     }),
   );
 
-  await app.listen(8080);
+  // app.useGlobalGuards(new AuthGuard(new Reflector(), new JwtService()));
+
+  await app.listen(process.env.PORT);
 }
-bootstrap();
+void bootstrap();

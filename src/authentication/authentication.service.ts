@@ -6,7 +6,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { SignUp, signIn } from './interfaces/auth.interface';
 import { hash, compare } from 'bcrypt';
-import { UserRepository } from 'src/users/users.repository';
+import { UsersRepository } from 'src/users/users.repository';
 
 const SALT = 10;
 
@@ -14,7 +14,7 @@ const SALT = 10;
 export class AuthenticationService {
   constructor(
     private readonly jwtService: JwtService,
-    private readonly userRepository: UserRepository,
+    private readonly userRepository: UsersRepository,
   ) {}
 
   async signUp(user: SignUp) {

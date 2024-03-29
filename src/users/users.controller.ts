@@ -1,6 +1,5 @@
 import { Controller, Get, Param, ParseIntPipe } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
 
 // The @Controller() decorator takes a string argument that defines the route for the controller.
 @Controller('users')

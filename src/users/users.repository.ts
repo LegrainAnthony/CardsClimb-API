@@ -6,21 +6,15 @@ import { PrismaService } from 'src/db/prisma.service';
 export class UserRepository {
   constructor(private readonly prismaService: PrismaService) {}
 
-  // Prisma met a disposition un type lié à chaque modèle de la base de données.
   create(user: Prisma.UserCreateInput) {
     return this.prismaService.user.create({
       data: user,
     });
   }
 
-  findOne(userWhereUniqueInput: Prisma.UserWhereUniqueInput) {
-    return this.prismaService.user.findUnique({
+  findOne(userWhereUniqueInput: Prisma.UserWhereInput) {
+    return this.prismaService.user.findFirst({
       where: userWhereUniqueInput,
-      select: {
-        id: true,
-        email: true,
-        username: true,
-      },
     });
   }
 }

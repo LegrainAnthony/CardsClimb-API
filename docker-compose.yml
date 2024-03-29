@@ -39,7 +39,20 @@ services:
       - postgres-network
     volumes:
       - pgadmin-data:/var/lib/pgadmin/
+  db-test:
+    image: postgres
+    networks:
+      - postgres-network
+    ports:
+      - '5434:5432'
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB_TEST}
+      POSTGRES_USER: ${POSTGRES_USER_TEST}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - db-test:/var/lib/postgresql/data
 
 volumes:
   db-data:
   pgadmin-data:
+  db-test:

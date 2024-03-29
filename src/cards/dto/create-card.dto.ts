@@ -14,10 +14,4 @@ export class CreateCardDto {
     @IsString()
     @IsOptional()
     answer: string
-
-    card_type: Prisma.CardTypeCreateNestedOneWithoutCardsInput
-    
-    @IsNumber()
-    @IsNotEmpty()
-    card_type_id: number
 }

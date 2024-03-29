@@ -42,10 +42,7 @@ export class AuthenticationService {
   }
 
   async signIn(user: signIn) {
-    const userFound = await this.userRepository.findOne(
-      { email: user.email },
-      true,
-    );
+    const userFound = await this.userRepository.findOne({ email: user.email });
 
     if (!userFound) {
       throw new NotFoundException('User not found');

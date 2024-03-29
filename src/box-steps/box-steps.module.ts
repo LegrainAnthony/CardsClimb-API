@@ -4,6 +4,6 @@ import { BoxStepsController } from './box-steps.controller';
 
 @Module({
   providers: [BoxStepsService],
-  controllers: [BoxStepsController]
+  controllers: [BoxStepsController],
 })
 export class BoxStepsModule {}

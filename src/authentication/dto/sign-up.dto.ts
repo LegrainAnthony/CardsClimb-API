@@ -5,7 +5,7 @@ import {
   IsStrongPassword,
 } from 'class-validator';
 
-export class CreateUserDto {
+export class SignUpDto {
   @IsString()
   @IsNotEmpty()
   username: string;
@@ -16,8 +16,6 @@ export class CreateUserDto {
 
   @IsString()
   @IsNotEmpty()
-  @IsStrongPassword({
-    minLength: 12,
-  })
-  hashedPassword: string;
+  @IsStrongPassword()
+  password: string;
 }

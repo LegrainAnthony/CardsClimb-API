@@ -5,6 +5,7 @@ import { BoxesModule } from './boxes/boxes.module';
 import { CardsModule } from './cards/cards.module';
 import { TagsModule } from './tags/tags.module';
 import { UsersModule } from './users/users.module';
+import { CommonModule } from './common/common.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { UsersModule } from './users/users.module';
     CardsModule,
     TagsModule,
     UsersModule,
+    CommonModule,
   ],
   controllers: [],
   providers: [],

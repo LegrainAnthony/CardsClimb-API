@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
-import { AuthTokenGuard } from './guards/auth-token.guard';
+import { AuthTokenGuard } from './guards';
 import { ConfigModule } from '@nestjs/config';
 
 @Module({

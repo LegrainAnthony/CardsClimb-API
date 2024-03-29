@@ -1,38 +1,58 @@
-import { ForbiddenException, HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CardsRepository } from './cards.repository';
 import { Prisma } from '@prisma/client';
 import { CreateCardDto } from './dto/create-card.dto';
 import { UserRepository } from 'src/users/users.repository';
 import { error } from 'console';
+import { UpdateCardDto } from './dto/update-card.dto';
 
 @Injectable()
 export class CardsService {
-    constructor(private readonly cardsRepository: CardsRepository, private readonly userRepository: UserRepository){}
-
-    private async getConnectedUser() {
-        return await this.userRepository.findOne({ id: 1 })
-    }
-
-    async createCard(data: CreateCardDto, cardTypeId: string, userId: number) {
-        //! Inclure vérificatioon des card_type
+    constructor(private readonly cardsRepository: CardsRepository){}
+    
+    async createCard(data: CreateCardDto, cardTypeId: number, userId: number) {
         return this.cardsRepository.create({
             ...data,
             user: { connect: { id: userId } },
-            card_type: { connect: { id: Number(cardTypeId) } }
+            card_type: { connect: { id: cardTypeId } }
         })
     }
 
     async findOneCard(id: number, userId: number) {
-        console.log(userId);
         const card = await this.cardsRepository.findOne({id});
-        // const user = await  this.getConnectedUser();
+        
+        if(!card) {
+            throw new BadRequestException;
+        }
         if(card.user_id !== userId) {
-            throw new ForbiddenException();
+            throw new ForbiddenException;
         }
         return card;
     }
     
-    udpateOneCard(id: number, datas: UpdateCardData) {
+    async updateOneCard(id: number, cardTypeId: number, userId: number, datas: UpdateCardDto) {
+        try {
+            await this.findOneCard(id, userId);
+            const updatedData = {
+                ...datas,
+                card_type: { connect: { id: cardTypeId } },
+            };
+            return this.cardsRepository.updateOne({ id }, updatedData);
+        } catch (err) {
+            throw err;
+        }
+    }
 
+    async deleteOneCard(id: number, userId: number) {
+        try {
+            await this.findOneCard(id, userId);
+            return this.cardsRepository.deleteOne({ id });
+        } catch (err) {
+            throw err;
+        }
+    }
+
+    findManyCards(userId: number) {
+        return this.cardsRepository.findMany(userId)
     }
 }

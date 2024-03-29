@@ -12,16 +12,28 @@ export class CardsRepository {
     })
   }
 
-  findOne(cardWHereUniqueInput: Prisma.CardWhereUniqueInput) {
+  findOne(CardWhereUniqueInput: Prisma.CardWhereUniqueInput) {
     return this.prismaService.card.findUnique({
-        where: cardWHereUniqueInput,
+        where: CardWhereUniqueInput,
     })
   }
 
-  udpateOne(cardWhereUniqueInput: Prisma.CardWhereUniqueInput, datas: UpdateCardData  ) {
+  updateOne(CardWhereUniqueInput: Prisma.CardWhereUniqueInput, datas: Prisma.CardUpdateInput  ) {
     return this.prismaService.card.update({
-      where: cardWhereUniqueInput,
+      where: CardWhereUniqueInput,
       data: datas
+    })
+  }
+
+  deleteOne(CardWhereUniqueInput: Prisma.CardWhereUniqueInput) {
+    return this.prismaService.card.delete({
+      where: CardWhereUniqueInput
+    })
+  }
+
+  findMany(userId: number) {
+    return this.prismaService.card.findMany({
+      where: {user_id : userId}
     })
   }
 }

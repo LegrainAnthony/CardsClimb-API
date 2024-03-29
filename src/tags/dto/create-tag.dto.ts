@@ -1,6 +1,4 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { Prisma } from '@prisma/client';
-import { IsNotEmpty, IsNumber, IsObject, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class CreateTagDto {
   @IsString()
@@ -10,4 +8,8 @@ export class CreateTagDto {
   @IsNotEmpty()
   @IsNumber()
   color_id: number;
+
+  @IsNotEmpty()
+  @IsNumber()
+  user_id: number;
 }

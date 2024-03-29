@@ -2,81 +2,84 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { TagsService } from 'src/tags/tags.service';
 import { PrismaService } from 'src/db/prisma.service';
 import { AppModule } from 'src/app.module';
+import { Prisma } from '@prisma/client';
+import { CreateTagDto } from 'src/tags/dto/create-tag.dto';
 
 describe('TagService', () => {
   let service: TagsService;
   let prisma: PrismaService;
+  let userId: number;
+  let testTags: CreateTagDto;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
     prisma = moduleFixture.get<PrismaService>(PrismaService);
     service = moduleFixture.get<TagsService>(TagsService);
-  });
+    const userData: Prisma.UserCreateInput = {
+      email: 'test@gmail.com',
+      hashed_password: 'password',
+      username: 'testuser',
+    };
 
-  it('/tags (GET)', () => {
-    const testTags = [
-      {
-        id: 1,
-        name: 'test',
-        color_id: 1,
-        user_id: 1,
-      },
-    ];
-    prisma.tag.findMany = jest.fn().mockResolvedValue(testTags);
-    void expect(service.findAll(1)).resolves.toEqual(testTags);
-  });
+    const user = await prisma.user.create({
+      data: userData,
+    });
+    userId = user.id;
 
-  it('/tags/1 (GET)', () => {
-    const testTags = {
-      id: 1,
+    testTags = {
       name: 'test',
       color_id: 1,
-      user_id: 1,
+      user_id: userId,
     };
-    prisma.tag.findUnique = jest.fn().mockResolvedValue(testTags);
-    void expect(service.findOne(1, 1)).resolves.toEqual(testTags);
+
+    await prisma.color.create({ data: { name: 'Violet', hex: '#A78BFA' } });
+  });
+  afterAll(async () => {
+    await prisma.clearDatabase();
   });
 
-  it('/tags (Post)', () => {
-    const testTags = {
-      id: 1,
-      name: 'test',
-      color_id: 1,
-      user_id: 1,
-    };
-    prisma.tag.create = jest.fn().mockResolvedValue(testTags);
-    void expect(
-      service.create({ name: 'test', color_id: 1, user_id: 1 }),
-    ).resolves.toEqual(testTags);
+  it('/tags (Post)', async () => {
+    const tag = await service.create(testTags);
+
+    expect(tag.name).toBe(testTags.name);
+    expect(tag.color_id).toBe(testTags.color_id);
+    expect(tag.user_id).toBe(testTags.user_id);
   });
 
-  it('/tags/1 (Put)', () => {
-    const testTags = {
-      id: 1,
-      name: 'test',
-      color_id: 1,
-      user_id: 1,
-    };
-    prisma.tag.findUnique = jest.fn().mockResolvedValue(testTags);
-    prisma.tag.update = jest.fn().mockResolvedValue(testTags);
-    void expect(service.findOne(1, 1)).resolves.toEqual(testTags);
-    void expect(
-      service.update(1, { name: 'test', user_id: 1 }),
-    ).resolves.toEqual(testTags);
+  it('/tags (GET)', async () => {
+    const tags = await service.findAll(userId);
+
+    expect(tags).toBeInstanceOf(Array);
+    expect(tags).toHaveLength(1);
+
+    expect(tags[0].name).toBe(testTags.name);
+    expect(tags[0].color_id).toBe(testTags.color_id);
+    expect(tags[0].user_id).toBe(testTags.user_id);
   });
 
-  it('/tags/1 (delete)', () => {
-    const testTags = {
-      id: 1,
-      name: 'test',
-      color_id: 1,
-      user_id: 1,
-    };
-    prisma.tag.findUnique = jest.fn().mockResolvedValue(testTags);
-    prisma.tag.delete = jest.fn().mockResolvedValue(testTags);
-    void expect(service.findOne(1, 1)).resolves.toEqual(testTags);
-    void expect(service.delete(1, 1)).resolves.toEqual(testTags);
+  it('/tags/1 (GET)', async () => {
+    const tag = await service.findOne(1, userId);
+
+    expect(tag.name).toBe(testTags.name);
+    expect(tag.color_id).toBe(testTags.color_id);
+    expect(tag.user_id).toBe(testTags.user_id);
+  });
+
+  it('/tags/1 (Put)', async () => {
+    const tag = await service.update(1, { name: 'test2', user_id: userId });
+
+    expect(tag.name).toBe('test2');
+    expect(tag.color_id).toBe(testTags.color_id);
+    expect(tag.user_id).toBe(testTags.user_id);
+  });
+
+  it('/tags/1 (delete)', async () => {
+    const tag = await service.delete(1, userId);
+
+    expect(tag.name).toBe('test2');
+    expect(tag.color_id).toBe(testTags.color_id);
+    expect(tag.user_id).toBe(testTags.user_id);
   });
 });

@@ -7,6 +7,6 @@ import { TagRepository } from './tags.repository';
 @Module({
   imports: [PrismaModule],
   providers: [TagsService, TagRepository],
-  controllers: [TagsController]
+  controllers: [TagsController],
 })
 export class TagsModule {}

@@ -1,18 +1,22 @@
 import { UpdateTagDto } from './dto/update-tag.dto';
-import { Injectable } from '@nestjs/common';
-import { TagRepository } from './tags.repository';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { TagsRepository } from './tags.repository';
 import { CreateTagDto } from './dto/create-tag.dto';
 
 @Injectable()
 export class TagsService {
-  constructor(private readonly tagRepository: TagRepository) {}
+  constructor(private readonly tagRepository: TagsRepository) {}
 
-  findAll() {
-    return this.tagRepository.findAll();
+  findAll(userId: number) {
+    return this.tagRepository.findAll(userId);
   }
 
-  findOne(id: number) {
-    return this.tagRepository.findOne({ id });
+  async findOne(id: number, userId: number) {
+    const tag = await this.tagRepository.findOne({ id, user_id: userId });
+    if (tag === null) {
+      throw new NotFoundException();
+    }
+    return tag;
   }
 
   create(data: CreateTagDto) {
@@ -23,25 +27,45 @@ export class TagsService {
           id: data.color_id,
         },
       },
+      user: {
+        connect: {
+          id: data.user_id,
+        },
+      },
     });
   }
 
-  update(id: number, data: UpdateTagDto) {
-    return this.tagRepository.update(
-      { id },
-      {
-        ...(dataToSend(data) as UpdateTagDto),
-        color: {
-          connect: {
-            id: data.color_id,
+  async update(id: number, data: UpdateTagDto) {
+    try {
+      const tag = await this.findOne(id, data.user_id);
+      return this.tagRepository.update(
+        { id },
+        {
+          ...(dataToSend(data) as UpdateTagDto),
+          color: {
+            connect: {
+              id: data.color_id || tag.color_id,
+            },
+          },
+          user: {
+            connect: {
+              id: tag.user_id,
+            },
           },
         },
-      },
-    );
+      );
+    } catch (e) {
+      throw e;
+    }
   }
 
-  delete(id: number) {
-    return this.tagRepository.delete({ id });
+  async delete(id: number, userId: number) {
+    try {
+      await this.findOne(id, userId);
+      return this.tagRepository.delete({ id });
+    } catch (e) {
+      throw e;
+    }
   }
 }
 
@@ -50,9 +74,9 @@ export class TagsService {
  * @param data Objet à mapper
  * @returns
  */
-function dataToSend(data: Object) {
+function dataToSend(data: object) {
   return Object.keys(data)
-    .filter((key) => key != 'color_id')
+    .filter((key) => key !== 'color_id' && key !== 'user_id')
     .reduce((obj, key) => {
       obj[key] = data[key];
       return obj;

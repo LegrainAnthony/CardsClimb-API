@@ -1,13 +1,17 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/db/prisma.service';
+import { PrismaService } from '../db/prisma.service';
 import { Prisma } from '@prisma/client';
 
 @Injectable()
-export class TagRepository {
+export class TagsRepository {
   constructor(private readonly prismaService: PrismaService) {}
 
-  findAll() {
-    return this.prismaService.tag.findMany();
+  findAll(userId: number) {
+    return this.prismaService.tag.findMany({
+      where: {
+        user_id: userId,
+      },
+    });
   }
 
   findOne(tagWhereUniqueInput: Prisma.TagWhereUniqueInput) {

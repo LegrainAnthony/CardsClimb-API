@@ -4,6 +4,7 @@ import { PrismaService } from 'src/db/prisma.service';
 import { AppModule } from 'src/app.module';
 import { Prisma } from '@prisma/client';
 import { CreateTagDto } from 'src/tags/dto/create-tag.dto';
+import { NotFoundException } from '@nestjs/common';
 
 describe('TagService', () => {
   let service: TagsService;
@@ -17,6 +18,8 @@ describe('TagService', () => {
     }).compile();
     prisma = moduleFixture.get<PrismaService>(PrismaService);
     service = moduleFixture.get<TagsService>(TagsService);
+    await prisma.clearDatabase();
+
     const userData: Prisma.UserCreateInput = {
       email: 'test@gmail.com',
       hashed_password: 'password',
@@ -36,11 +39,8 @@ describe('TagService', () => {
 
     await prisma.color.create({ data: { name: 'Violet', hex: '#A78BFA' } });
   });
-  afterAll(async () => {
-    await prisma.clearDatabase();
-  });
 
-  it('/tags (Post)', async () => {
+  it('/tags (POST)', async () => {
     const tag = await service.create(testTags);
 
     expect(tag.name).toBe(testTags.name);
@@ -67,7 +67,7 @@ describe('TagService', () => {
     expect(tag.user_id).toBe(testTags.user_id);
   });
 
-  it('/tags/1 (Put)', async () => {
+  it('/tags/1 (PATCH)', async () => {
     const tag = await service.update(1, { name: 'test2', user_id: userId });
 
     expect(tag.name).toBe('test2');
@@ -75,11 +75,15 @@ describe('TagService', () => {
     expect(tag.user_id).toBe(testTags.user_id);
   });
 
-  it('/tags/1 (delete)', async () => {
+  it('/tags/1 (DELETE)', async () => {
     const tag = await service.delete(1, userId);
 
     expect(tag.name).toBe('test2');
     expect(tag.color_id).toBe(testTags.color_id);
     expect(tag.user_id).toBe(testTags.user_id);
+
+    await expect(service.findOne(tag.id, userId)).rejects.toThrow(
+      new NotFoundException(),
+    );
   });
 });

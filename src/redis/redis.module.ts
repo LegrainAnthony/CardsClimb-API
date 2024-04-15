@@ -8,14 +8,18 @@ import { redisStore } from 'cache-manager-redis-store';
     CacheModule.registerAsync({
       isGlobal: true,
       useFactory: async () => {
-        const store = await redisStore({
-          socket: {
-            host: 'localhost',
-            port: 6379,
-          },
-        });
-
-        return { store } as unknown as CacheStore;
+        if (process.env.NODE_ENV === 'test') {
+          return { store: 'memory' } as unknown as CacheStore;
+        } else {
+          const store = await redisStore({
+            database: parseInt(process.env.REDIS_DB, 10),
+            socket: {
+              host: process.env.REDIS_HOST,
+              port: parseInt(process.env.REDIS_PORT, 10),
+            },
+          });
+          return { store } as unknown as CacheStore;
+        }
       },
     }),
   ],

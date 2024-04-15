@@ -16,7 +16,7 @@ import { UpdateCardDto } from './dto/update-card.dto';
 export class CardsService {
   constructor(private readonly cardsRepository: CardsRepository) {}
 
-  async createCard(data: CreateCardDto, cardTypeId: number, userId: number) {
+  createCard(data: CreateCardDto, cardTypeId: number, userId: number) {
     return this.cardsRepository.create({
       ...data,
       user: { connect: { id: userId } },

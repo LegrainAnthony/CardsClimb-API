@@ -6,12 +6,13 @@ export class CardTypesService {
     constructor(private readonly cardTypesRepository: CardTypesRepository) {}
 
     async findOneCard(id: number) {
-        try {
+
             const cardType = await this.cardTypesRepository.findOne({ id });
+            if(!cardType) {
+                throw new NotFoundException();
+            }
             return cardType;
-        } catch {
-            throw new NotFoundException();
-        }
+  
     }
 
     async findAll() {

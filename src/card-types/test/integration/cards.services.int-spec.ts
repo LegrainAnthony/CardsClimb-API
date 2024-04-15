@@ -28,16 +28,14 @@ describe('CardService', () => {
   describe('create', () => {
     it('/cardTypes/2 (GET)', async () => {
         const cardTypeFind = await cardTypesService.findOneCardType(cardType.id);
-        const all = await cardTypesService.findAll();
-        console.log(all);
-        
         expect(cardTypeFind.id).toBe(cardType.id)
-        expect(cardTypeFind.name).toBe('flash')
+        expect(cardTypeFind.name).toBe(cardType.name)
     });
-
+    
     it('/cardTypes (GET)', async () => {
-
+        const allCardTypes = await cardTypesService.findAll();
+        expect(allCardTypes[0].id).toBe(cardType.id)
+        expect(allCardTypes[0].name).toBe(cardType.name)
     })
-
   });
 });

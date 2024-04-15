@@ -6,6 +6,7 @@ import { CardsModule } from './cards/cards.module';
 import { TagsModule } from './tags/tags.module';
 import { UsersModule } from './users/users.module';
 import { CommonModule } from './common/common.module';
+import { PrismaModule } from './db/prisma.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { CommonModule } from './common/common.module';
     TagsModule,
     UsersModule,
     CommonModule,
+    PrismaModule,
   ],
   controllers: [],
   providers: [],

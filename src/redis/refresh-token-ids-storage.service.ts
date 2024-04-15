@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { Redis } from 'ioredis';
 
+// This service is responsible for storing and validating refresh token IDs in Redis
 @Injectable()
 export class RefreshTokenIdsStorageService
   implements OnApplicationBootstrap, OnApplicationShutdown
@@ -22,8 +23,10 @@ export class RefreshTokenIdsStorageService
     return this.redisClient.quit();
   }
 
-  async insert(userId: number, tokenId: string): Promise<void> {
-    await this.redisClient.set(this.getKey(userId), tokenId);
+  async insert(userId: number, tokenId: string, ttl: number): Promise<void> {
+    const key = this.getKey(userId);
+    await this.redisClient.set(key, tokenId);
+    await this.redisClient.expire(key, ttl);
   }
 
   async validate(userId: number, tokenId: string): Promise<boolean> {

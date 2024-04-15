@@ -4,6 +4,7 @@ import { SignUpDto } from './dto/sign-up.dto';
 import { SignInDto } from './dto/sign-in.dto';
 import { Public } from 'src/common/decorators/public.decorator';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { UserId } from 'src/common/decorators/user-id.decorator';
 
 @Controller('authentication')
 export class AuthenticationController {
@@ -23,7 +24,10 @@ export class AuthenticationController {
 
   @HttpCode(HttpStatus.OK)
   @Post('refresh-tokens')
-  refreshTokens(@Body() refreshTokenDto: RefreshTokenDto) {
-    return this.authenticationService.refreshTokens(refreshTokenDto);
+  refreshTokens(
+    @Body() refreshTokenDto: RefreshTokenDto,
+    @UserId() userId: number,
+  ) {
+    return this.authenticationService.refreshTokens(refreshTokenDto, userId);
   }
 }

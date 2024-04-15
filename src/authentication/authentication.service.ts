@@ -78,14 +78,18 @@ export class AuthenticationService {
         refreshTokenId,
       }),
     ]);
-    await this.refreshTokenIdsStorage.insert(user.id, refreshTokenId);
+    await this.refreshTokenIdsStorage.insert(
+      user.id,
+      refreshTokenId,
+      this.jwtConfiguration.refreshTokenTtl,
+    );
     return {
       accessToken,
       refreshToken,
     };
   }
 
-  async refreshTokens(refreshTokenDto: RefreshTokenDto) {
+  async refreshTokens(refreshTokenDto: RefreshTokenDto, userId: number) {
     try {
       const { sub, refreshTokenId } = await this.jwtService.verifyAsync<{
         sub: number;
@@ -95,9 +99,16 @@ export class AuthenticationService {
         audience: this.jwtConfiguration.audience,
         issuer: this.jwtConfiguration.issuer,
       });
+
+      if (userId !== sub) {
+        throw new UnauthorizedException();
+      }
+
       const user = await this.userRepository.findOne({
         id: sub,
       });
+      // Vérfier si l'id du refresh token est valide, si ce n'est pas le cas
+      // il est fort possible que le payload du token ait été modifié
       const isValid = await this.refreshTokenIdsStorage.validate(
         user.id,
         refreshTokenId,

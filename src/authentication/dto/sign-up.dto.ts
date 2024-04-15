@@ -16,6 +16,8 @@ export class SignUpDto {
 
   @IsString()
   @IsNotEmpty()
-  @IsStrongPassword()
+  // @IsStrongPassword({
+  //   minLength: 12,
+  // })
   password: string;
 }

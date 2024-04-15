@@ -52,6 +52,12 @@ export class AuthTokenGuard implements CanActivate {
     } catch {
       throw new UnauthorizedException();
     }
+
+
+    request.user = decodedToken;
+
+    return true;
+
   }
 
   extractTokenFromRequest(request: Request) {

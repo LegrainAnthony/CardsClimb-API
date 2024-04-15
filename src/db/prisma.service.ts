@@ -32,8 +32,6 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
       await this.user.deleteMany();
 
       await this.color.deleteMany();
-
-      console.log('Database cleared successfully');
     }
   }
 }

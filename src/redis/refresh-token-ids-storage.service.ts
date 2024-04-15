@@ -4,7 +4,7 @@ import { Inject, Injectable } from '@nestjs/common';
 // This service is responsible for storing and validating refresh token IDs in Redis
 @Injectable()
 export class RefreshTokenIdsStorageService {
-  constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {}
+  constructor(@Inject(CACHE_MANAGER) private readonly cacheManager: Cache) {}
 
   async insert(userId: number, tokenId: string, ttl: number): Promise<void> {
     const key = this.getKey(userId);

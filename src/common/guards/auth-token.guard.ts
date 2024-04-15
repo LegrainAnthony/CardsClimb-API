@@ -4,12 +4,11 @@ import {
   ExecutionContext,
   Inject,
   Injectable,
-  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
-import { Request, Response } from 'express';
+import { Request } from 'express';
 import { PUBLIC_KEY } from '../decorators/public.decorator';
 import { ConfigType } from '@nestjs/config';
 import jwtConfig from 'src/config/jwt.config';

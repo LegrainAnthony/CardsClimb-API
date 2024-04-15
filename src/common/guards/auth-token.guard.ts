@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   CanActivate,
   ExecutionContext,
   Inject,
@@ -8,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 import { PUBLIC_KEY } from '../decorators/public.decorator';
 import { ConfigType } from '@nestjs/config';
 import jwtConfig from 'src/config/jwt.config';
@@ -33,7 +34,7 @@ export class AuthTokenGuard implements CanActivate {
       return true;
     }
 
-    const request = context.switchToHttp().getRequest();
+    const request = context.switchToHttp().getRequest() as Request;
 
     const extractedToken = this.extractTokenFromRequest(request);
 
@@ -45,7 +46,6 @@ export class AuthTokenGuard implements CanActivate {
       const decodedToken = await this.jwtService.verifyAsync(extractedToken, {
         secret: this.jwtConfiguration.secret,
       });
-      console.log(decodedToken);
       request[REQUEST_USER_KEY] = decodedToken;
 
       return true;
@@ -58,7 +58,7 @@ export class AuthTokenGuard implements CanActivate {
     const authHeader = request.headers.authorization;
 
     if (!authHeader) {
-      throw new NotFoundException('Authorization header is missing');
+      throw new BadRequestException('Authorization header is missing');
     }
 
     const [bearer, token] = authHeader.split(' ');

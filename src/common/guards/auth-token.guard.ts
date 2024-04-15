@@ -1,6 +1,7 @@
 import {
   CanActivate,
   ExecutionContext,
+  Inject,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -9,16 +10,17 @@ import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { PUBLIC_KEY } from '../decorators/public.decorator';
-
-const MINUTES = 60;
-const LIMIT_TOKEN_EXPIRATION = 1 * MINUTES; // 1 minute
-const TO_SECONDS = 1000;
+import { ConfigType } from '@nestjs/config';
+import jwtConfig from 'src/config/jwt.config';
+import { REQUEST_USER_KEY } from 'src/authentication/constant/user.constant';
 
 @Injectable()
 export class AuthTokenGuard implements CanActivate {
   constructor(
     private readonly reflector: Reflector,
     private readonly jwtService: JwtService,
+    @Inject(jwtConfig.KEY)
+    private readonly jwtConfiguration: ConfigType<typeof jwtConfig>,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -32,27 +34,30 @@ export class AuthTokenGuard implements CanActivate {
     }
 
     const request = context.switchToHttp().getRequest();
-    const response = context.switchToHttp().getResponse();
 
     const extractedToken = this.extractTokenFromRequest(request);
 
     if (!extractedToken) {
-      return false;
+      throw new UnauthorizedException();
     }
 
-    const decodedToken = await this.jwtService.verifyAsync(extractedToken, {
-      ignoreExpiration: true,
-    });
+    try {
+      const decodedToken = await this.jwtService.verifyAsync(extractedToken, {
+        secret: this.jwtConfiguration.secret,
+      });
+      console.log(decodedToken);
+      request[REQUEST_USER_KEY] = decodedToken;
 
-    const token = await this.checkTokenExpiration(decodedToken);
-
-    if (typeof token === 'string') {
-      response.setHeader('X-Refresh-Token', token);
+      return true;
+    } catch {
+      throw new UnauthorizedException();
     }
+
 
     request.user = decodedToken;
 
     return true;
+
   }
 
   extractTokenFromRequest(request: Request) {
@@ -69,21 +74,5 @@ export class AuthTokenGuard implements CanActivate {
     }
 
     return token;
-  }
-
-  async checkTokenExpiration(token: { sub: number; exp: number }) {
-    const nowInSec = Math.floor(Date.now() / TO_SECONDS);
-    if (nowInSec <= token.exp) {
-      return token;
-    }
-
-    if (nowInSec > token.exp && nowInSec - token.exp < LIMIT_TOKEN_EXPIRATION) {
-      const refreshedToken = await this.jwtService.signAsync({
-        sub: token.sub,
-      });
-      return refreshedToken;
-    }
-
-    throw new UnauthorizedException('Token expired');
   }
 }

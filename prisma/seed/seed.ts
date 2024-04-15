@@ -1,33 +1,22 @@
-
 import { PrismaClient } from '@prisma/client'
-import { wait } from '@testing-library/user-event/dist/utils'
-import { hash, hashSync } from 'bcrypt'
+import { userSeeder, colorSeeder, cardTypeSeeder, tagSeeder, boxSeeder, boxStepSeeder, cardSeeder } from "./seeders"
+
+
+// Ce Script permet de générer des données de test dans la base de données
+// Il est à exécuter naturellement avec la commande `npx prisma migrate dev --name init`
+// ou npx prisma db seed
 
 const prisma = new PrismaClient()
-const password = 'Password@test1!'
 
 async function main() {
-  const user = [{
-    where: { email: 'test@gmail.com' },
-    update: {},
-    create: {
-      username: 'Test',
-      email: 'test@gmail.com',
-      hashed_password: hashSync(password, 10)
-    }
-  }]
 
-  const collection = await prisma.$transaction(
-    userData.map(cur =>
-      prisma.cur.upsert({
-        where: { id: cur.id },
-        update: {},
-        create: { id: cur.id },
-      })
-    )
-  )
-
-  const card = await prisma
+  const usersCollection = await userSeeder(prisma);
+  const colorsCollection = await colorSeeder(prisma);
+  const cardTypesCollection = await cardTypeSeeder(prisma);
+  const tagsCollection = await tagSeeder(prisma, colorsCollection);
+  const boxesCollection = await boxSeeder(prisma, usersCollection);
+  const boxStepsCollection = await boxStepSeeder(prisma, boxesCollection);
+  const cardsCollection = await cardSeeder(prisma, cardTypesCollection, usersCollection, tagsCollection, boxesCollection, boxStepsCollection);
 }
 
 main()

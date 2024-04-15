@@ -8,6 +8,7 @@ import { TagsModule } from './tags/tags.module';
 import { UsersModule } from './users/users.module';
 import { CommonModule } from './common/common.module';
 import { PrismaModule } from './db/prisma.module';
+import { ColorsModule } from './colors/colors.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { PrismaModule } from './db/prisma.module';
     CardsModule,
     TagsModule,
     CardTypesModule,
+    ColorsModule,
     UsersModule,
     CommonModule,
     PrismaModule,

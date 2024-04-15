@@ -39,11 +39,6 @@ $ cp .env.test.example .env.test
 $ npm install
 ```
 
-## Migration Prisma
-```bash
-$ npx prisma migrate dev --name init
-```
-
 ## Running the app
 
 ```bash
@@ -55,6 +50,11 @@ $ npm run start:dev
 
 # production mode
 $ npm run start:prod 
+```
+
+## Migration Prisma
+```bash
+$ npx prisma migrate dev --name init
 ```
 
 ## Test

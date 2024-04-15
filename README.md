@@ -31,7 +31,11 @@
 ## Installation
 
 ```bash
+# copie des variables d'environnement
 $ cp .env.example .env
+$ cp .env.test.example .env.test
+
+# installation des dépendances npm
 $ npm install
 ```
 

@@ -6,22 +6,37 @@ import { PrismaService } from 'src/db/prisma.service';
 export class CardsRepository {
   constructor(private readonly prismaService: PrismaService) {}
 
-  create(card: Prisma.CardCreateInput){
+  create(card: Prisma.CardCreateInput) {
     return this.prismaService.card.create({
-        data: card,
-    })
+      data: card,
+    });
   }
 
-  findOne(cardWHereUniqueInput: Prisma.CardWhereUniqueInput) {
+  findOne(CardWhereUniqueInput: Prisma.CardWhereUniqueInput) {
     return this.prismaService.card.findUnique({
-        where: cardWHereUniqueInput,
-    })
+      where: CardWhereUniqueInput,
+    });
   }
 
-  udpateOne(cardWhereUniqueInput: Prisma.CardWhereUniqueInput, datas: UpdateCardData  ) {
+  updateOne(
+    CardWhereUniqueInput: Prisma.CardWhereUniqueInput,
+    datas: Prisma.CardUpdateInput,
+  ) {
     return this.prismaService.card.update({
-      where: cardWhereUniqueInput,
-      data: datas
-    })
+      where: CardWhereUniqueInput,
+      data: datas,
+    });
+  }
+
+  deleteOne(CardWhereUniqueInput: Prisma.CardWhereUniqueInput) {
+    return this.prismaService.card.delete({
+      where: CardWhereUniqueInput,
+    });
+  }
+
+  findMany(userId: number) {
+    return this.prismaService.card.findMany({
+      where: { user_id: userId },
+    });
   }
 }

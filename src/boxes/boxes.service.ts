@@ -4,7 +4,6 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { BoxesRepository } from './boxes.repository';
-import { Prisma } from '@prisma/client';
 import { CreateBoxDto } from './dto/create-boxes.dto';
 import { UpdateBoxDto } from './dto/update-boxes.dto';
 

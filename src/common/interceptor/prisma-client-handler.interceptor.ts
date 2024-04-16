@@ -12,10 +12,10 @@ import { Observable, catchError, throwError } from 'rxjs';
 export class prismaClientHandler implements NestInterceptor {
   intercept(
     context: ExecutionContext,
-    next: CallHandler<any>,
-  ): Observable<any> | Promise<Observable<any>> {
+    next: CallHandler<unknown>,
+  ): Observable<unknown> | Promise<Observable<unknown>> {
     return next.handle().pipe(
-      catchError((err): Observable<any> => {
+      catchError((err): Observable<unknown> => {
         if (err instanceof Prisma.PrismaClientKnownRequestError) {
           return throwError(() => new BadRequestException());
         }

@@ -4,6 +4,7 @@ import { PrismaService } from 'src/db/prisma.service';
 import { AppModule } from 'src/app.module';
 import { CreateBoxDto } from 'src/boxes/dto/create-boxes.dto';
 import { UpdateBoxDto } from 'src/boxes/dto/update-boxes.dto';
+import { randomUUID } from 'crypto';
 
 describe('BoxService', () => {
   let service: BoxesService;
@@ -23,7 +24,7 @@ describe('BoxService', () => {
     // Création d'un utilisateur pour les tests
     const user = await prisma.user.create({
       data: {
-        email: 'test@gmail.com',
+        email: `test-${randomUUID()}@gmail.com`,
         hashed_password: 'password',
         username: 'testuser',
       },

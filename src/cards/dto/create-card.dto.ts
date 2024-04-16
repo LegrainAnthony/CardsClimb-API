@@ -1,5 +1,4 @@
-import { CardType, Prisma, User } from '@prisma/client';
-import { IsString, IsNotEmpty, IsOptional, IsNumber } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
 
 export class CreateCardDto {
   @IsString()

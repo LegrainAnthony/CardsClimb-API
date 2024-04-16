@@ -15,16 +15,19 @@ import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { randomUUID } from 'crypto';
 import { RefreshTokenIdsStorageService } from 'src/redis/refresh-token-ids-storage.service';
 
+
 const SALT = 10;
 
 @Injectable()
 export class AuthenticationService {
   constructor(
     private readonly jwtService: JwtService,
+
     private readonly userRepository: UserRepository,
     private readonly refreshTokenIdsStorage: RefreshTokenIdsStorageService,
     @Inject(jwtConfig.KEY)
     private readonly jwtConfiguration: ConfigType<typeof jwtConfig>,
+
   ) {}
 
   async signUp(user: SignUp) {

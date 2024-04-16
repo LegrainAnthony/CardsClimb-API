@@ -1,0 +1,7 @@
+export { userSeeder } from './userSeeder'
+export { colorSeeder } from './colorSeeder'
+export { cardTypeSeeder } from './cardsTypeSeeder'
+export { tagSeeder } from './tagSeeder'
+export { boxSeeder } from './boxSeeder'
+export { boxStepSeeder } from './boxStepSeeder'
+export { cardSeeder } from './cardSeeder'

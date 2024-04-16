@@ -1,10 +1,10 @@
 generator client {
-    provider = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-    provider = "postgresql"
-    url      = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -14,31 +14,34 @@ model User {
     hashed_password String
     boxes Box[]
     cards Card[]
+    tags Tag[]
 }
 
 model Box {
-    id Int @default(autoincrement()) @id
-    name String
-    user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
-    user_id Int
-    box_steps BoxStep[]
-    cards Card[]
+  id        Int       @id @default(autoincrement())
+  name      String
+  user      User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user_id   Int
+  box_steps BoxStep[]
+  cards     Card[]
 }
 
 model Card {
-    id Int @default(autoincrement()) @id
-    reference  String
-    question String
-    answer String?
-    last_revision DateTime?
-    future_revision DateTime?
-    user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
-    user_id Int
-    box Box? @relation(fields: [box_id], references: [id], onDelete: Cascade)
-    box_id Int?
-    card_type CardType @relation(fields: [card_type_id], references: [id])
-    card_type_id Int
-    tags Tag[]
+  id              Int       @id @default(autoincrement())
+  reference       String
+  question        String
+  answer          String?
+  last_revision   DateTime?
+  future_revision DateTime?
+  user            User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user_id         Int
+  box             Box?      @relation(fields: [box_id], references: [id], onDelete: Cascade)
+  box_id          Int?
+  boxStep         BoxStep?  @relation(fields: [box_step_id], references: [id], onDelete: Cascade)
+  box_step_id     Int?
+  card_type       CardType  @relation(fields: [card_type_id], references: [id])
+  card_type_id    Int
+  tags            Tag[]
 }
 
 model Tag {
@@ -47,24 +50,28 @@ model Tag {
     color Color @relation(fields: [color_id], references: [id])
     color_id Int
     cards Card[]
+    user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+    user_id Int
+
 }
 
 model CardType {
-    id Int @default(autoincrement()) @id
-    name String
-    cards Card[]
+  id    Int    @id @default(autoincrement())
+  name  String @unique
+  cards Card[]
 }
 
 model BoxStep {
-    id Int @default(autoincrement()) @id
-    interval Int
-    box Box @relation(fields: [box_id], references: [id], onDelete: Cascade)
-    box_id Int
+  id       Int    @id @default(autoincrement())
+  interval Int
+  box      Box    @relation(fields: [box_id], references: [id], onDelete: Cascade)
+  box_id   Int
+  Card     Card[]
 }
 
 model Color {
-    id Int @default(autoincrement()) @id
-    name String
-    hex String
-    tags Tag[]
+  id   Int    @id @default(autoincrement())
+  name String
+  hex  String
+  tags Tag[]
 }

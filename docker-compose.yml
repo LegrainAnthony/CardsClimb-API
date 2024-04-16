@@ -1,5 +1,5 @@
 version: '3'
-networks: 
+networks:
   postgres-network:
     driver: bridge
 
@@ -9,7 +9,7 @@ services:
     ports:
       - '5432:5432'
     networks:
-    - postgres-network
+      - postgres-network
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
@@ -51,10 +51,12 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - db-test:/var/lib/postgresql/data
+
   redis:
     image: redis
     ports:
       - '6379:6379'
+
 
 volumes:
   db-data:

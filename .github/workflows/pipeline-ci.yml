@@ -36,6 +36,8 @@ jobs:
           POSTGRES_PASSWORD: 'postgres'
           PGADMIN_DEFAULT_EMAIL: 'admin@admin.com'
           PGADMIN_DEFAULT_PASSWORD: 'password'
+          POSTGRES_DB_TEST: 'cardclimb-test'
+          POSTGRES_USER_TEST: 'cardclimb-test'
       - run: npm ci
       - run: npm run test:int
         env:

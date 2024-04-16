@@ -5,7 +5,9 @@ import { CardTypesRepository } from './cardType.repository';
 export class CardTypesService {
     constructor(private readonly cardTypesRepository: CardTypesRepository) {}
 
+
     async findOneCard(id: number) {
+
 
             const cardType = await this.cardTypesRepository.findOne({ id });
             if(!cardType) {

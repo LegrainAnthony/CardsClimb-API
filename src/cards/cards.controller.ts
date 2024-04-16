@@ -15,7 +15,7 @@ import {
 import { CardsService } from './cards.service';
 import { CreateCardDto } from './dto/create-card.dto';
 import { prismaClientHandler } from 'src/common/interceptor';
-import { UserId } from 'src/common/decorators';
+import { ActiveUser } from 'src/common/decorators';
 import { UpdateCardDto } from './dto/update-card.dto';
 import { Response } from 'express';
 
@@ -25,7 +25,7 @@ export class CardsController {
   constructor(private readonly cardsService: CardsService) {}
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number, @UserId() userId: number) {
+  findOne(@Param('id', ParseIntPipe) id: number, @ActiveUser() userId: number) {
     return this.cardsService.findOneCard(id, userId);
   }
 
@@ -33,7 +33,7 @@ export class CardsController {
   create(
     @Body() card: CreateCardDto,
     @Query('cardTypeId', ParseIntPipe) cardTypeId: number,
-    @UserId() userId: number,
+    @ActiveUser() userId: number,
   ) {
     return this.cardsService.createCard(card, cardTypeId, userId);
   }
@@ -43,7 +43,7 @@ export class CardsController {
     @Body() datas: UpdateCardDto,
     @Param('id', ParseIntPipe) id: number,
     @Query('cardTypeId', ParseIntPipe) cardTypeId: number,
-    @UserId() userId: number,
+    @ActiveUser() userId: number,
   ) {
     return this.cardsService.updateOneCard(id, cardTypeId, userId, datas);
   }
@@ -51,7 +51,7 @@ export class CardsController {
   @Delete(':id')
   async deleteOne(
     @Param('id', ParseIntPipe) id: number,
-    @UserId() userId: number,
+    @ActiveUser() userId: number,
     @Res() res: Response,
   ) {
     await this.cardsService.deleteOneCard(id, userId);
@@ -62,7 +62,7 @@ export class CardsController {
   }
 
   @Get()
-  AllCardsFromAUser(@UserId() userId: number) {
+  AllCardsFromAUser(@ActiveUser() userId: number) {
     return this.cardsService.findManyCards(userId);
   }
 }

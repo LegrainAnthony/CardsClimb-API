@@ -1,9 +1,9 @@
 import {
+  BadRequestException,
   CanActivate,
   ExecutionContext,
   Inject,
   Injectable,
-  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
@@ -33,7 +33,7 @@ export class AuthTokenGuard implements CanActivate {
       return true;
     }
 
-    const request = context.switchToHttp().getRequest();
+    const request = context.switchToHttp().getRequest() as Request;
 
     const extractedToken = this.extractTokenFromRequest(request);
 
@@ -45,7 +45,6 @@ export class AuthTokenGuard implements CanActivate {
       const decodedToken = await this.jwtService.verifyAsync(extractedToken, {
         secret: this.jwtConfiguration.secret,
       });
-      console.log(decodedToken);
       request[REQUEST_USER_KEY] = decodedToken;
 
       return true;
@@ -65,7 +64,7 @@ export class AuthTokenGuard implements CanActivate {
     const authHeader = request.headers.authorization;
 
     if (!authHeader) {
-      throw new NotFoundException('Authorization header is missing');
+      throw new BadRequestException('Authorization header is missing');
     }
 
     const [bearer, token] = authHeader.split(' ');

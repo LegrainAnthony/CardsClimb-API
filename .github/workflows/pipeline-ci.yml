@@ -40,6 +40,9 @@ jobs:
           JWT_TOKEN_ISSUER: 'localhost:3000'
           JWT_EXPIRATION: 3600
           JWT_REFRESH_TOKEN_EXPIRATION: 86400
+          REDIS_HOST: 'localhost'
+          REDIS_PORT: 6379
+          REDIS_NUMBER: 0
       - run: npm ci
       - run: npm run test:int
         env:

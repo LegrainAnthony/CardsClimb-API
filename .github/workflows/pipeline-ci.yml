@@ -29,7 +29,15 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20.x'
-      - run: docker compose up --build
+      - uses: hoverkraft-tech/compose-action@v1.5.1
+        with:
+          compose-file: "./docker-compose.yml"
+        env:
+          POSTGRES_DB: 'cardclimb'
+          POSTGRES_USER: 'cardclimb'
+          POSTGRES_PASSWORD: 'postgres'
+          PGADMIN_DEFAULT_EMAIL: 'admin@admin.com'
+          PGADMIN_DEFAULT_PASSWORD: 'password'
       - run: npm ci
       - run: npm run test:int
       - run: npm run build

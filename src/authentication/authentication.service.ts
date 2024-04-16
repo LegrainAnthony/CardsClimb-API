@@ -7,14 +7,13 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { SignUp, signIn } from './interfaces/auth.interface';
 import { hash, compare } from 'bcrypt';
-import { UserRepository } from 'src/users/users.repository';
+import { UsersRepository } from 'src/users/users.repository';
 import jwtConfig from 'src/config/jwt.config';
 import { ConfigType } from '@nestjs/config';
 import { User } from '@prisma/client';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { randomUUID } from 'crypto';
 import { RefreshTokenIdsStorageService } from 'src/redis/refresh-token-ids-storage.service';
-
 
 const SALT = 10;
 
@@ -23,11 +22,10 @@ export class AuthenticationService {
   constructor(
     private readonly jwtService: JwtService,
 
-    private readonly userRepository: UserRepository,
+    private readonly userRepository: UsersRepository,
     private readonly refreshTokenIdsStorage: RefreshTokenIdsStorageService,
     @Inject(jwtConfig.KEY)
     private readonly jwtConfiguration: ConfigType<typeof jwtConfig>,
-
   ) {}
 
   async signUp(user: SignUp) {

@@ -12,6 +12,7 @@ const signUpData: SignUpDto = {
   username: 'test',
   password: 'password',
 };
+const salt = 10;
 
 describe('AuthenticationService', () => {
   let prisma: PrismaService;
@@ -34,7 +35,7 @@ describe('AuthenticationService', () => {
       data: {
         email: signUpData.email,
         username: signUpData.username,
-        hashed_password: hashSync(signUpData.password, 10),
+        hashed_password: hashSync(signUpData.password, salt),
       },
     });
   });
@@ -87,7 +88,8 @@ describe('AuthenticationService', () => {
       } catch (e) {
         expect(e).toBeInstanceOf(UnauthorizedException);
         if (e instanceof UnauthorizedException) {
-          expect(e.getStatus()).toBe(401);
+          const unauthorizedStatus = 401;
+          expect(e.getStatus()).toBe(unauthorizedStatus);
         }
       }
     });
@@ -117,7 +119,8 @@ describe('AuthenticationService', () => {
       } catch (e) {
         expect(e).toBeInstanceOf(UnauthorizedException);
         if (e instanceof UnauthorizedException) {
-          expect(e.getStatus()).toBe(401);
+          const unauthorizedStatus = 401;
+          expect(e.getStatus()).toBe(unauthorizedStatus);
         }
       }
     });

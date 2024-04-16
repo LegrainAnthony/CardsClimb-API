@@ -9,17 +9,16 @@ import { redisStore } from 'cache-manager-redis-store';
       isGlobal: true,
       useFactory: async () => {
         if (process.env.NODE_ENV === 'test') {
-          return { store: 'memory' } as unknown as CacheStore;
-        } else {
-          const store = await redisStore({
-            database: parseInt(process.env.REDIS_DB, 10),
-            socket: {
-              host: process.env.REDIS_HOST,
-              port: parseInt(process.env.REDIS_PORT, 10),
-            },
-          });
-          return { store } as unknown as CacheStore;
+          return { store: 'memory' };
         }
+        const store = await redisStore({
+          database: parseInt(process.env.REDIS_DB, 10),
+          socket: {
+            host: process.env.REDIS_HOST,
+            port: parseInt(process.env.REDIS_PORT, 10),
+          },
+        });
+        return { store } as unknown as CacheStore;
       },
     }),
   ],

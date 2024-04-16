@@ -8,12 +8,13 @@ datasource db {
 }
 
 model User {
-  id              Int    @id @default(autoincrement())
-  username        String
-  email           String @unique
-  hashed_password String
-  boxes           Box[]
-  cards           Card[]
+    id Int @default(autoincrement()) @id
+    username String
+    email String @unique
+    hashed_password String
+    boxes Box[]
+    cards Card[]
+    tags Tag[]
 }
 
 model Box {
@@ -44,11 +45,14 @@ model Card {
 }
 
 model Tag {
-  id       Int    @id @default(autoincrement())
-  name     String
-  color    Color  @relation(fields: [color_id], references: [id])
-  color_id Int
-  cards    Card[]
+    id Int @default(autoincrement()) @id
+    name String
+    color Color @relation(fields: [color_id], references: [id])
+    color_id Int
+    cards Card[]
+    user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+    user_id Int
+
 }
 
 model CardType {

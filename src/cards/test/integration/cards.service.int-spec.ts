@@ -59,7 +59,7 @@ describe('CardService', () => {
       expect(card.last_revision).toBe(null);
       expect(card.future_revision).toBe(null);
       expect(card.box_id).toBe(null);
-      expect(card.card_type_id).toBe(1);
+      expect(card.card_type_id).toBe(cardType.id);
     });
 
     it('/cards/1 (GET)', async () => {
@@ -71,7 +71,7 @@ describe('CardService', () => {
       expect(card.last_revision).toBe(null);
       expect(card.future_revision).toBe(null);
       expect(card.box_id).toBe(null);
-      expect(card.card_type_id).toBe(1);
+      expect(card.card_type_id).toBe(cardType.id);
     })
 
     it('/cards/1 (PATCH)', async () => {
@@ -86,7 +86,7 @@ describe('CardService', () => {
       expect(card.last_revision).toBe(null);
       expect(card.future_revision).toBe(null);
       expect(card.box_id).toBe(null);
-      expect(card.card_type_id).toBe(1);
+      expect(card.card_type_id).toBe(cardType.id);
     })
 
     it('/tags/1 (delete)', async () => {

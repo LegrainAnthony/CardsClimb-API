@@ -38,6 +38,6 @@ jobs:
           PGADMIN_DEFAULT_PASSWORD: 'password'
       - run: npm ci
       - run: npm run test:int
-      env:
-        DATABASE_URL: 'postgres://cardclimb-test:postgres@localhost:5434/cardclimb-test'
+        env:
+          DATABASE_URL: 'postgres://cardclimb-test:postgres@localhost:5434/cardclimb-test'
       - run: npm run build

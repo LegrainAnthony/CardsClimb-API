@@ -1,15 +1,10 @@
 import {
   BadRequestException,
   ForbiddenException,
-  HttpException,
-  HttpStatus,
   Injectable,
 } from '@nestjs/common';
 import { CardsRepository } from './cards.repository';
-import { Prisma } from '@prisma/client';
 import { CreateCardDto } from './dto/create-card.dto';
-import { UserRepository } from 'src/users/users.repository';
-import { error } from 'console';
 import { UpdateCardDto } from './dto/update-card.dto';
 
 @Injectable()

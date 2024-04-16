@@ -121,7 +121,7 @@ module.exports = {
     'no-bitwise': 'error',
     'no-caller': 'error',
     'no-cond-assign': 'error',
-    'no-console': NODE_ENV === 'production' ? 'error' : 'off',
+    'no-console': 'error',
     'no-debugger': 'error',
     'no-else-return': 'error',
     'no-redeclare': 'off',

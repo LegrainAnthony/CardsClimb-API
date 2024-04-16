@@ -27,6 +27,7 @@ CREATE TABLE "Card" (
     "future_revision" TIMESTAMP(3),
     "user_id" INTEGER NOT NULL,
     "box_id" INTEGER,
+    "box_step_id" INTEGER,
     "card_type_id" INTEGER NOT NULL,
 
     CONSTRAINT "Card_pkey" PRIMARY KEY ("id")
@@ -37,6 +38,7 @@ CREATE TABLE "Tag" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
     "color_id" INTEGER NOT NULL,
+    "user_id" INTEGER NOT NULL,
 
     CONSTRAINT "Tag_pkey" PRIMARY KEY ("id")
 );
@@ -77,6 +79,9 @@ CREATE TABLE "_CardToTag" (
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "CardType_name_key" ON "CardType"("name");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "_CardToTag_AB_unique" ON "_CardToTag"("A", "B");
 
 -- CreateIndex
@@ -92,10 +97,16 @@ ALTER TABLE "Card" ADD CONSTRAINT "Card_user_id_fkey" FOREIGN KEY ("user_id") RE
 ALTER TABLE "Card" ADD CONSTRAINT "Card_box_id_fkey" FOREIGN KEY ("box_id") REFERENCES "Box"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "Card" ADD CONSTRAINT "Card_box_step_id_fkey" FOREIGN KEY ("box_step_id") REFERENCES "BoxStep"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "Card" ADD CONSTRAINT "Card_card_type_id_fkey" FOREIGN KEY ("card_type_id") REFERENCES "CardType"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Tag" ADD CONSTRAINT "Tag_color_id_fkey" FOREIGN KEY ("color_id") REFERENCES "Color"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Tag" ADD CONSTRAINT "Tag_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "BoxStep" ADD CONSTRAINT "BoxStep_box_id_fkey" FOREIGN KEY ("box_id") REFERENCES "Box"("id") ON DELETE CASCADE ON UPDATE CASCADE;

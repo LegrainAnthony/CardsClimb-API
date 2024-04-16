@@ -64,6 +64,7 @@ model CardType {
 model BoxStep {
   id       Int    @id @default(autoincrement())
   interval Int
+  order    Int
   box      Box    @relation(fields: [box_id], references: [id], onDelete: Cascade)
   box_id   Int
   Card     Card[]

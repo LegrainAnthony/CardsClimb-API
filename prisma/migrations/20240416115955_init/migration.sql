@@ -55,6 +55,7 @@ CREATE TABLE "CardType" (
 CREATE TABLE "BoxStep" (
     "id" SERIAL NOT NULL,
     "interval" INTEGER NOT NULL,
+    "order" INTEGER NOT NULL,
     "box_id" INTEGER NOT NULL,
 
     CONSTRAINT "BoxStep_pkey" PRIMARY KEY ("id")

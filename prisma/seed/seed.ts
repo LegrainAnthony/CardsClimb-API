@@ -13,7 +13,7 @@ async function main() {
   const usersCollection = await userSeeder(prisma);
   const colorsCollection = await colorSeeder(prisma);
   const cardTypesCollection = await cardTypeSeeder(prisma);
-  const tagsCollection = await tagSeeder(prisma, colorsCollection);
+  const tagsCollection = await tagSeeder(prisma, colorsCollection, usersCollection);
   const boxesCollection = await boxSeeder(prisma, usersCollection);
   const boxStepsCollection = await boxStepSeeder(prisma, boxesCollection);
   const cardsCollection = await cardSeeder(prisma, cardTypesCollection, usersCollection, tagsCollection, boxesCollection, boxStepsCollection);

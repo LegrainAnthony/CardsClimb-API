@@ -13,6 +13,7 @@ import { PUBLIC_KEY } from '../decorators/public.decorator';
 import { ConfigType } from '@nestjs/config';
 import jwtConfig from 'src/config/jwt.config';
 import { REQUEST_USER_KEY } from 'src/authentication/constant/user.constant';
+import { REFRESH_TOKEN_KEY } from '../decorators/refresh-token.decorator';
 
 @Injectable()
 export class AuthTokenGuard implements CanActivate {
@@ -24,11 +25,7 @@ export class AuthTokenGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const isPublic = this.reflector.getAllAndOverride<boolean>(PUBLIC_KEY, [
-      context.getHandler(),
-      context.getClass(),
-    ]);
-
+    const isPublic = this.getMetadata(PUBLIC_KEY, context);
     if (isPublic) {
       return true;
     }
@@ -42,22 +39,24 @@ export class AuthTokenGuard implements CanActivate {
     }
 
     try {
-      const decodedToken = await this.jwtService.verifyAsync(extractedToken, {
-        secret: this.jwtConfiguration.secret,
-      });
+      let decodedToken;
+
+      const isRefreshToken = this.getMetadata(REFRESH_TOKEN_KEY, context);
+
+      if (isRefreshToken) {
+        decodedToken = await this.jwtService.decode(extractedToken);
+      } else {
+        decodedToken = await this.jwtService.verifyAsync(extractedToken, {
+          secret: this.jwtConfiguration.secret,
+        });
+      }
+
       request[REQUEST_USER_KEY] = decodedToken;
 
       return true;
     } catch {
       throw new UnauthorizedException();
     }
-
-
-    request.user = decodedToken;
-
-    return true;
-
-
   }
 
   extractTokenFromRequest(request: Request) {
@@ -74,5 +73,12 @@ export class AuthTokenGuard implements CanActivate {
     }
 
     return token;
+  }
+
+  getMetadata(key: string, context: ExecutionContext) {
+    return this.reflector.getAllAndOverride<boolean>(key, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
   }
 }

@@ -1,5 +1,9 @@
 import { UpdateTagDto } from './dto/update-tag.dto';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { TagsRepository } from './tags.repository';
 import { CreateTagDto } from './dto/create-tag.dto';
 
@@ -9,6 +13,14 @@ export class TagsService {
 
   findAll(userId: number) {
     return this.tagRepository.findAll(userId);
+  }
+
+  async findMany(ids: number[], userId: number) {
+    const tags = await this.tagRepository.findMany(ids, userId);
+    if (tags.includes(null)) {
+      throw new BadRequestException();
+    }
+    return tags;
   }
 
   async findOne(id: number, userId: number) {

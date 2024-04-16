@@ -14,6 +14,17 @@ export class TagsRepository {
     });
   }
 
+  findMany(ids: number[], userId: number) {
+    return this.prismaService.tag.findMany({
+      where: {
+        id: {
+          in: ids,
+        },
+        user_id: userId,
+      },
+    });
+  }
+
   findOne(tagWhereUniqueInput: Prisma.TagWhereUniqueInput) {
     return this.prismaService.tag.findUnique({
       where: tagWhereUniqueInput,

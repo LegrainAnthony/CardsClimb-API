@@ -5,6 +5,7 @@ import {
   Get,
   HttpStatus,
   Param,
+  ParseArrayPipe,
   ParseIntPipe,
   Patch,
   Post,
@@ -18,6 +19,7 @@ import { UpdateTagDto } from './dto/update-tag.dto';
 import { ActiveUser } from 'src/common/decorators';
 import { Response } from 'express';
 import { prismaClientHandler } from 'src/common/interceptor';
+import { ParamsDto } from './dto/params-tag.dto';
 
 @Controller('tags')
 @UseInterceptors(prismaClientHandler)
@@ -27,6 +29,15 @@ export class TagsController {
   @Get()
   findAll(@ActiveUser() userId: number) {
     return this.tagService.findAll(userId);
+  }
+
+  @Get('list')
+  findMany(
+    @ActiveUser() userId: number,
+    @Query('ids', new ParseArrayPipe({ separator: ',', items: Number }))
+    ids: number[],
+  ) {
+    return this.tagService.findMany(ids, userId);
   }
 
   @Get(':id')
@@ -43,11 +54,10 @@ export class TagsController {
     return this.tagService.create(userId, colorId, tag);
   }
 
-  @Patch(':id')
+  @Patch(':id/:colorId')
   update(
-    @Param('id', ParseIntPipe) id: number,
+    @Param() { id, colorId }: ParamsDto,
     @ActiveUser() userId: number,
-    @Query('colorId', ParseIntPipe) colorId: number,
     @Body() tag: UpdateTagDto,
   ) {
     return this.tagService.update(id, userId, colorId, tag);

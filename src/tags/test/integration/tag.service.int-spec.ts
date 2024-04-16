@@ -61,6 +61,24 @@ describe('TagService', () => {
     expect(tags[0].user_id).toBe(userId);
   });
 
+  it('/tags/list (GET)', async () => {
+    const tags = await service.findMany([tagCreated.id], userId);
+
+    expect(tags).toBeInstanceOf(Array);
+    expect(tags).toHaveLength(1);
+
+    expect(tags[0].name).toBe(testTags.name);
+    expect(tags[0].color_id).toBe(colorId);
+    expect(tags[0].user_id).toBe(userId);
+  });
+
+  it('/tags/list (GET) with wrong id', async () => {
+    const tags = await service.findMany([tagCreated.id - 1], userId);
+
+    expect(tags).toBeInstanceOf(Array);
+    expect(tags).toHaveLength(0);
+  });
+
   it('/tags/1 (GET)', async () => {
     const tag = await service.findOne(tagCreated.id, userId);
 

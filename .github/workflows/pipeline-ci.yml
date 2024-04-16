@@ -22,5 +22,5 @@ jobs:
         with:
           node-version: '20.x'
       - run: npm ci
-      - run: npm run test
+      - run: npm run test:int
       - run: npm run build

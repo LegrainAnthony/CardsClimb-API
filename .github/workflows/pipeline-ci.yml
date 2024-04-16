@@ -16,9 +16,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      POSTGRES_DB: 'cardclimb'
-      POSTGRES_USER: 'cardclimb'
-      POSTGRES_PASSWORD: 'postgres'
       DATABASE_URL: 'postgres://cardclimb:postgres@localhost:5432/cardclimb'
       PORT: 8080
       JWT_SECRET: 'secret'

@@ -1,7 +1,6 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Box, Prisma } from '@prisma/client';
 import { PrismaService } from 'src/db/prisma.service';
-import { CreateBoxDto } from './dto/create-boxes.dto';
 
 @Injectable()
 export class BoxesRepository {
@@ -25,7 +24,7 @@ export class BoxesRepository {
   ) {
     return this.prismaService.box.update({
       where: BoxWhereUniqueInput,
-      data: data,
+      data,
     });
   }
 

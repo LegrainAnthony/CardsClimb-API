@@ -23,6 +23,6 @@ export class CardTypesController {
   @Public()
   @Get(':id')
   findOneCardsTypes(@Param('id', ParseIntPipe) id: number) {
-    return this.cardTypesService.findOneCard(id);
+    return this.cardTypesService.findOneCardsTypes(id);
   }
 }

@@ -61,12 +61,12 @@ export class TagsService {
           ...data,
           color: {
             connect: {
-              id: colorId || tag.color_id,
+              id: colorId || tag.color.id,
             },
           },
           user: {
             connect: {
-              id: tag.user_id,
+              id: userId,
             },
           },
         },

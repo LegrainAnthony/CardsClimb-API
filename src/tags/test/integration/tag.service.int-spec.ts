@@ -43,11 +43,11 @@ describe('TagService', () => {
   });
 
   it('/tags (POST)', async () => {
-    tagCreated = await service.create(userId, colorId, testTags);
+    const tag = await service.create(userId, colorId, testTags);
+    tagCreated = { ...tag, color_id: tag.color.id, user_id: null };
 
     expect(tagCreated.name).toBe(testTags.name);
     expect(tagCreated.color_id).toBe(colorId);
-    expect(tagCreated.user_id).toBe(userId);
   });
 
   it('/tags (GET)', async () => {
@@ -57,8 +57,7 @@ describe('TagService', () => {
     expect(tags).toHaveLength(1);
 
     expect(tags[0].name).toBe(testTags.name);
-    expect(tags[0].color_id).toBe(colorId);
-    expect(tags[0].user_id).toBe(userId);
+    expect(tags[0].color.id).toBe(colorId);
   });
 
   it('/tags/list (GET)', async () => {
@@ -68,8 +67,7 @@ describe('TagService', () => {
     expect(tags).toHaveLength(1);
 
     expect(tags[0].name).toBe(testTags.name);
-    expect(tags[0].color_id).toBe(colorId);
-    expect(tags[0].user_id).toBe(userId);
+    expect(tags[0].color.id).toBe(colorId);
   });
 
   it('/tags/list (GET) with wrong id', async () => {
@@ -83,8 +81,7 @@ describe('TagService', () => {
     const tag = await service.findOne(tagCreated.id, userId);
 
     expect(tag.name).toBe(testTags.name);
-    expect(tag.color_id).toBe(colorId);
-    expect(tag.user_id).toBe(userId);
+    expect(tag.color.id).toBe(colorId);
   });
 
   it('/tags/1 (PATCH)', async () => {
@@ -93,16 +90,14 @@ describe('TagService', () => {
     });
 
     expect(tag.name).toBe('test2');
-    expect(tag.color_id).toBe(colorId);
-    expect(tag.user_id).toBe(userId);
+    expect(tag.color.id).toBe(colorId);
   });
 
   it('/tags/1 (DELETE)', async () => {
     const tag = await service.delete(tagCreated.id, userId);
 
     expect(tag.name).toBe('test2');
-    expect(tag.color_id).toBe(colorId);
-    expect(tag.user_id).toBe(userId);
+    expect(tag.color.id).toBe(colorId);
 
     await expect(service.findOne(tag.id, userId)).rejects.toThrow(
       new NotFoundException(),

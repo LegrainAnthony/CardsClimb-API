@@ -16,10 +16,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      DATABASE_URL: 'postgres://cardclimb:postgres@localhost:5432/cardclimb'
-      PORT: 8080
-      JWT_SECRET: 'secret'
-      JWT_EXPIRATION: '10s'
+      
     steps:
       - uses: actions/checkout@v4
       - name: Use Node.js
@@ -38,6 +35,13 @@ jobs:
           PGADMIN_DEFAULT_PASSWORD: 'password'
           POSTGRES_DB_TEST: 'cardclimb-test'
           POSTGRES_USER_TEST: 'cardclimb-test'
+          DATABASE_URL: 'postgres://cardclimb:postgres@localhost:5432/cardclimb'
+          PORT: 8080
+          JWT_SECRET: 'SECRET'
+          JWT_TOKEN_AUDIENCE: 'localhost:3000'
+          JWT_TOKEN_ISSUER: 'localhost:3000'
+          JWT_EXPIRATION: 3600
+          JWT_REFRESH_TOKEN_EXPIRATION: 86400
       - run: npm ci
       - run: npm run test:int
         env:

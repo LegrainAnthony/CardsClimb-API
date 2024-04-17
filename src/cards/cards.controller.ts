@@ -62,7 +62,25 @@ export class CardsController {
   }
 
   @Get()
-  AllCardsFromAUser(@ActiveUser() userId: number) {
-    return this.cardsService.findManyCards(userId);
+  AllCardsFromUser(@ActiveUser() userId: number) {
+    return this.cardsService.findAllFromUser(userId);
+  }
+
+  @Get('/validate/:id')
+  async validateCard(
+    @Param('id', ParseIntPipe) id: number,
+    @ActiveUser() userId: number,
+  ){
+    return this.cardsService.validateCard(id, userId)
+  }
+
+  @Get('store-in-box/:id')
+  async storeInBox(
+    @Param('id', ParseIntPipe) id: number,
+    @ActiveUser() userId: number,
+    @Query('boxId', ParseIntPipe) boxId: number,
+    @Query('boxStepId', ParseIntPipe) boxStepId: number,
+  ) {
+    return this.cardsService.StoreCardInBox(id, boxId, boxStepId, userId)
   }
 }

@@ -8,11 +8,18 @@ import { TagsModule } from './tags/tags.module';
 import { UsersModule } from './users/users.module';
 import { CommonModule } from './common/common.module';
 import { PrismaModule } from './db/prisma.module';
-
 import { ColorsModule } from './colors/colors.module';
+import { ConfigModule } from '@nestjs/config';
+import { configClassValidator } from './lib/config-class-validator';
+import { Environment } from './env.validation';
+import appConfig from './config/app.config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      validate: configClassValidator(Environment),
+      load: [appConfig],
+    }),
     AuthenticationModule,
     BoxStepsModule,
     BoxesModule,

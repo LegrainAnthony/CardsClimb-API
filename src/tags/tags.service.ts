@@ -1,5 +1,9 @@
 import { UpdateTagDto } from './dto/update-tag.dto';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { TagsRepository } from './tags.repository';
 import { CreateTagDto } from './dto/create-tag.dto';
 
@@ -11,6 +15,14 @@ export class TagsService {
     return this.tagRepository.findAll(userId);
   }
 
+  async findMany(ids: number[], userId: number) {
+    const tags = await this.tagRepository.findMany(ids, userId);
+    if (tags.includes(null)) {
+      throw new BadRequestException();
+    }
+    return tags;
+  }
+
   async findOne(id: number, userId: number) {
     const tag = await this.tagRepository.findOne({ id, user_id: userId });
     if (tag === null) {
@@ -19,37 +31,42 @@ export class TagsService {
     return tag;
   }
 
-  create(data: CreateTagDto) {
+  create(userId: number, colorId: number, data: CreateTagDto) {
     return this.tagRepository.create({
-      ...(dataToSend(data) as CreateTagDto),
+      ...data,
       color: {
         connect: {
-          id: data.color_id,
+          id: colorId,
         },
       },
       user: {
         connect: {
-          id: data.user_id,
+          id: userId,
         },
       },
     });
   }
 
-  async update(id: number, data: UpdateTagDto) {
+  async update(
+    id: number,
+    userId: number,
+    colorId: number,
+    data: UpdateTagDto,
+  ) {
     try {
-      const tag = await this.findOne(id, data.user_id);
+      const tag = await this.findOne(id, userId);
       return this.tagRepository.update(
         { id },
         {
-          ...(dataToSend(data) as UpdateTagDto),
+          ...data,
           color: {
             connect: {
-              id: data.color_id || tag.color_id,
+              id: colorId || tag.color.id,
             },
           },
           user: {
             connect: {
-              id: tag.user_id,
+              id: userId,
             },
           },
         },
@@ -67,18 +84,4 @@ export class TagsService {
       throw e;
     }
   }
-}
-
-/**
- * Map un objet pour qu'il corresponde au format demandé par Prisma pour les Tags
- * @param data Objet à mapper
- * @returns
- */
-function dataToSend(data: object) {
-  return Object.keys(data)
-    .filter((key) => key !== 'color_id' && key !== 'user_id')
-    .reduce((obj, key) => {
-      obj[key] = data[key];
-      return obj;
-    }, {});
 }

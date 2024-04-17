@@ -11,18 +11,49 @@ export class TagsRepository {
       where: {
         user_id: userId,
       },
+      select: {
+        id: true,
+        name: true,
+        color: true,
+      },
+    });
+  }
+
+  findMany(ids: number[], userId: number) {
+    return this.prismaService.tag.findMany({
+      where: {
+        id: {
+          in: ids,
+        },
+        user_id: userId,
+      },
+      select: {
+        id: true,
+        name: true,
+        color: true,
+      },
     });
   }
 
   findOne(tagWhereUniqueInput: Prisma.TagWhereUniqueInput) {
     return this.prismaService.tag.findUnique({
       where: tagWhereUniqueInput,
+      select: {
+        id: true,
+        name: true,
+        color: true,
+      },
     });
   }
 
   create(tag: Prisma.TagCreateInput) {
     return this.prismaService.tag.create({
       data: tag,
+      select: {
+        id: true,
+        name: true,
+        color: true,
+      },
     });
   }
 
@@ -33,12 +64,22 @@ export class TagsRepository {
     return this.prismaService.tag.update({
       where: tagWhereUniqueInput,
       data: tag,
+      select: {
+        id: true,
+        name: true,
+        color: true,
+      },
     });
   }
 
   delete(tagWhereUniqueInput: Prisma.TagWhereUniqueInput) {
     return this.prismaService.tag.delete({
       where: tagWhereUniqueInput,
+      select: {
+        id: true,
+        name: true,
+        color: true,
+      },
     });
   }
 }

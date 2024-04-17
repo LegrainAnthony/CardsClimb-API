@@ -10,6 +10,7 @@ describe('TagService', () => {
   let service: TagsService;
   let prisma: PrismaService;
   let userId: number;
+  let colorId: number;
   let testTags: CreateTagDto;
   let tagCreated: Tag;
 
@@ -35,20 +36,18 @@ describe('TagService', () => {
     const color = await prisma.color.create({
       data: { name: 'Violet', hex: '#A78BFA' },
     });
-
+    colorId = color.id;
     testTags = {
       name: 'test',
-      color_id: color.id,
-      user_id: userId,
     };
   });
 
   it('/tags (POST)', async () => {
-    tagCreated = await service.create(testTags);
+    const tag = await service.create(userId, colorId, testTags);
+    tagCreated = { ...tag, color_id: tag.color.id, user_id: null };
 
     expect(tagCreated.name).toBe(testTags.name);
-    expect(tagCreated.color_id).toBe(testTags.color_id);
-    expect(tagCreated.user_id).toBe(testTags.user_id);
+    expect(tagCreated.color_id).toBe(colorId);
   });
 
   it('/tags (GET)', async () => {
@@ -58,35 +57,47 @@ describe('TagService', () => {
     expect(tags).toHaveLength(1);
 
     expect(tags[0].name).toBe(testTags.name);
-    expect(tags[0].color_id).toBe(testTags.color_id);
-    expect(tags[0].user_id).toBe(testTags.user_id);
+    expect(tags[0].color.id).toBe(colorId);
+  });
+
+  it('/tags/list (GET)', async () => {
+    const tags = await service.findMany([tagCreated.id], userId);
+
+    expect(tags).toBeInstanceOf(Array);
+    expect(tags).toHaveLength(1);
+
+    expect(tags[0].name).toBe(testTags.name);
+    expect(tags[0].color.id).toBe(colorId);
+  });
+
+  it('/tags/list (GET) with wrong id', async () => {
+    const tags = await service.findMany([tagCreated.id - 1], userId);
+
+    expect(tags).toBeInstanceOf(Array);
+    expect(tags).toHaveLength(0);
   });
 
   it('/tags/1 (GET)', async () => {
     const tag = await service.findOne(tagCreated.id, userId);
 
     expect(tag.name).toBe(testTags.name);
-    expect(tag.color_id).toBe(testTags.color_id);
-    expect(tag.user_id).toBe(testTags.user_id);
+    expect(tag.color.id).toBe(colorId);
   });
 
   it('/tags/1 (PATCH)', async () => {
-    const tag = await service.update(tagCreated.id, {
+    const tag = await service.update(tagCreated.id, userId, null, {
       name: 'test2',
-      user_id: userId,
     });
 
     expect(tag.name).toBe('test2');
-    expect(tag.color_id).toBe(testTags.color_id);
-    expect(tag.user_id).toBe(testTags.user_id);
+    expect(tag.color.id).toBe(colorId);
   });
 
   it('/tags/1 (DELETE)', async () => {
     const tag = await service.delete(tagCreated.id, userId);
 
     expect(tag.name).toBe('test2');
-    expect(tag.color_id).toBe(testTags.color_id);
-    expect(tag.user_id).toBe(testTags.user_id);
+    expect(tag.color.id).toBe(colorId);
 
     await expect(service.findOne(tag.id, userId)).rejects.toThrow(
       new NotFoundException(),

@@ -3,13 +3,19 @@ import {
   ForbiddenException,
   Injectable,
 } from '@nestjs/common';
+import * as moment from 'moment'
 import { CardsRepository } from './cards.repository';
 import { CreateCardDto } from './dto/create-card.dto';
 import { UpdateCardDto } from './dto/update-card.dto';
+import { BoxesService } from 'src/boxes/boxes.service';
+import { BoxStep, Prisma } from '@prisma/client';
 
 @Injectable()
 export class CardsService {
-  constructor(private readonly cardsRepository: CardsRepository) {}
+  constructor(
+    private readonly cardsRepository: CardsRepository,
+    private readonly boxesService: BoxesService
+  ) {}
 
   createCard(data: CreateCardDto, cardTypeId: number, userId: number) {
     return this.cardsRepository.create({
@@ -58,7 +64,70 @@ export class CardsService {
     }
   }
 
-  findManyCards(userId: number) {
-    return this.cardsRepository.findMany(userId);
+  findAllFromUser(userId: number) {
+    return this.cardsRepository.findAll(userId);
+  }
+
+  private calculateFutureRevision(interval: number) {
+    return moment().add(interval, 'days').format();
+  }
+
+  private calculateLastRevision() {
+     return moment().format()    
+  }
+
+  private calculatePositionStep (currentStepBox: BoxStep, BoxSteps: BoxStep[]) {
+      return BoxSteps.find((box) => currentStepBox.order + 1 === box.order);
+  }
+
+  private getCurrentBoxStep(currentStepBox: number, BoxSteps: BoxStep[]) {
+    return BoxSteps.find((box) => box.id === currentStepBox);
+  }
+
+
+
+  async validateCard(cardId: number, userId: number) {
+    try {
+      const card = await this.findOneCard(cardId, userId);
+      if(!card.box_id) throw new BadRequestException()
+      const box = await this.boxesService.getBoxWithBoxSteps(card.box_id, userId);
+      const currentBoxStep = this.getCurrentBoxStep(card.box_step_id, box.box_steps)
+      const futureBoxStep = this.calculatePositionStep(currentBoxStep, box.box_steps);
+      
+      const updatedData: Prisma.CardUpdateInput = {
+        box: futureBoxStep ? { connect: { id:  box.id } } : { disconnect: true },
+        last_revision:  this.calculateLastRevision(),
+        boxStep: futureBoxStep ? { connect: { id:  futureBoxStep.id } } : { disconnect: true },
+        future_revision: futureBoxStep ? this.calculateFutureRevision( futureBoxStep.interval) : null
+        }
+        
+        return this.cardsRepository.updateOne(card , updatedData)
+      }
+    catch (e) {
+      console.log(e);
+     }
+  }
+
+
+
+  async StoreCardInBox(cardId: number, boxId: number, boxStepId: number,  userId: number ) {
+    try {
+      const card = await this.findOneCard(cardId, userId);
+      const box = await this.boxesService.getBoxWithBoxSteps(boxId, userId);
+      const currentBoxStep = this.getCurrentBoxStep(boxStepId, box.box_steps) || box.box_steps[0];
+
+      const updatedData: Prisma.CardUpdateInput = {
+        box: { connect: { id: box.id } },
+        boxStep: { connect: { id:  currentBoxStep.id } },
+        future_revision: this.calculateFutureRevision(currentBoxStep.interval)
+      };
+      
+      return this.cardsRepository.updateOne(card , updatedData)
+      } catch (e) {
+
+    }
   }
 }
+
+
+

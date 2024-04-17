@@ -4,9 +4,10 @@ import { CardsController } from './cards.controller';
 import { PrismaModule } from 'src/db/prisma.module';
 import { CardsRepository } from './cards.repository';
 import { UsersRepository } from 'src/users/users.repository';
+import { BoxesModule } from 'src/boxes/boxes.module';
 
 @Module({
-  imports: [PrismaModule],
+  imports: [PrismaModule, BoxesModule],
   providers: [CardsService, CardsRepository, UsersRepository],
   controllers: [CardsController],
 })

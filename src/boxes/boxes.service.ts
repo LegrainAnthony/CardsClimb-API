@@ -1,7 +1,7 @@
 import {
-  BadRequestException,
   ForbiddenException,
   Injectable,
+  NotFoundException,
 } from '@nestjs/common';
 import { BoxesRepository } from './boxes.repository';
 import { CreateBoxDto } from './dto/create-boxes.dto';
@@ -22,7 +22,7 @@ export class BoxesService {
     const box = await this.boxRepository.findOne({ id });
 
     if (!box) {
-      throw new BadRequestException();
+      throw new NotFoundException();
     }
     if (box.user_id !== userId) {
       throw new ForbiddenException();

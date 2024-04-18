@@ -38,9 +38,9 @@ export class CardsRepository {
     });
   }
 
-  findAll(userId: number) {
+  findMany(cardWhereInput: Prisma.CardWhereInput) {
     return this.prismaService.card.findMany({
-      where: { user_id: userId },
+      where: cardWhereInput,
     });
   }
 }

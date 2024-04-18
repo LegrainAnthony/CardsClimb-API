@@ -17,7 +17,10 @@ import appConfig from './config/app.config';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      validate: configClassValidator(Environment),
+      validate:
+        process.env.NODE_ENV !== 'test'
+          ? configClassValidator(Environment)
+          : undefined,
       load: [appConfig],
     }),
     AuthenticationModule,

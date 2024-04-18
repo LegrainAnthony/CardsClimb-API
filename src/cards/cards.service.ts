@@ -3,7 +3,7 @@ import {
   ForbiddenException,
   Injectable,
 } from '@nestjs/common';
-import * as moment from 'moment';
+import * as moment from 'moment-timezone';
 import { CardsRepository } from './cards.repository';
 import { CreateCardDto } from './dto/create-card.dto';
 import { UpdateCardDto } from './dto/update-card.dto';
@@ -65,15 +65,15 @@ export class CardsService {
   }
 
   findAllFromUser(userId: number) {
-    return this.cardsRepository.findAll(userId);
+    return this.cardsRepository.findMany({ user_id: userId });
   }
 
   private calculateFutureRevision(interval: number) {
-    return moment().add(interval, 'days').format();
+    return Number(moment().tz('Asia/Tokyo').add(interval, 'days').format('x'));
   }
 
   private calculateLastRevision() {
-    return moment().format();
+    return Number(moment().format('x'));
   }
 
   private calculatePositionStep(currentStepBox: BoxStep, BoxSteps: BoxStep[]) {
@@ -161,5 +161,30 @@ export class CardsService {
     };
 
     return this.cardsRepository.updateOne(card, updatedData);
+  }
+
+  listCardRevisions(userId: number) {
+    const addOneDay = 1;
+    const subtractOneDay = 1;
+    return this.cardsRepository.findMany({
+      AND: [
+        {
+          user_id: userId,
+        },
+        {
+          future_revision: {
+            lte: Number(
+              moment().add(addOneDay, 'day').startOf('day').format('x'),
+            ),
+            gte: Number(
+              moment()
+                .subtract(subtractOneDay, 'days')
+                .startOf('day')
+                .format('x'),
+            ),
+          },
+        },
+      ],
+    });
   }
 }

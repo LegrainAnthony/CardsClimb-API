@@ -11,7 +11,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { PUBLIC_KEY } from '../decorators/public.decorator';
 import { ConfigType } from '@nestjs/config';
-import jwtConfig from 'src/config/jwt.config';
+import appConfig from 'src/config/app.config';
 import { REQUEST_USER_KEY } from 'src/authentication/constant/user.constant';
 import { REFRESH_TOKEN_KEY } from '../decorators/refresh-token.decorator';
 
@@ -20,8 +20,8 @@ export class AuthTokenGuard implements CanActivate {
   constructor(
     private readonly reflector: Reflector,
     private readonly jwtService: JwtService,
-    @Inject(jwtConfig.KEY)
-    private readonly jwtConfiguration: ConfigType<typeof jwtConfig>,
+    @Inject(appConfig.KEY)
+    private readonly jwtConfiguration: ConfigType<typeof appConfig>,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {

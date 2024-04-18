@@ -1,10 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/db/prisma.service';
+// import { TagsService } from 'src/tags/tags.service';
 
 @Injectable()
 export class CardsRepository {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    // private readonly tagsService: TagsService
+  ) {}
 
   create(card: Prisma.CardCreateInput) {
     return this.prismaService.card.create({
@@ -34,7 +38,7 @@ export class CardsRepository {
     });
   }
 
-  findMany(userId: number) {
+  findAll(userId: number) {
     return this.prismaService.card.findMany({
       where: { user_id: userId },
     });

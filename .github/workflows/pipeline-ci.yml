@@ -1,0 +1,51 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI Back
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "main" branch
+  pull_request:
+    branches: [ "develop" ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      JWT_SECRET: 'SECRET'
+      JWT_TOKEN_AUDIENCE: 'localhost:3000'
+      JWT_TOKEN_ISSUER: 'localhost:3000'
+      JWT_EXPIRATION: 3600
+      JWT_REFRESH_TOKEN_EXPIRATION: 86400
+      DATABASE_URL: 'postgres://cardclimb:postgres@localhost:5432/cardclimb'
+      PORT: 8080
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+      - uses: hoverkraft-tech/compose-action@v1.5.1
+        with:
+          up-flags: '-d --build'
+          compose-file: "./docker-compose.yml"
+        env:
+          PGADMIN_DEFAULT_EMAIL: 'admin@admin.com'
+          PGADMIN_DEFAULT_PASSWORD: 'password'
+          POSTGRES_DB: 'cardclimb'
+          POSTGRES_USER: 'cardclimb'
+          POSTGRES_PASSWORD: 'postgres'
+          POSTGRES_DB_TEST: 'cardclimb-test'
+          POSTGRES_USER_TEST: 'cardclimb-test'
+          REDIS_HOST: 'localhost'
+          REDIS_PORT: 6379
+          REDIS_DB: 0
+      - run: npm ci
+      - run: npm run test:int
+        env:
+          DATABASE_URL: 'postgres://cardclimb-test:postgres@localhost:5434/cardclimb-test'
+      - run: npm run build

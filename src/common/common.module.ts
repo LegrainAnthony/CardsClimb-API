@@ -2,10 +2,10 @@ import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthTokenGuard } from './guards';
 import { ConfigModule } from '@nestjs/config';
-import jwtConfig from 'src/config/jwt.config';
+import appConfig from 'src/config/app.config';
 
 @Module({
-  imports: [ConfigModule.forFeature(jwtConfig)],
+  imports: [ConfigModule.forFeature(appConfig)],
   providers: [
     {
       provide: APP_GUARD,

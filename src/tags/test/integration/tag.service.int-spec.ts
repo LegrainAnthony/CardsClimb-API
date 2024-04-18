@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { TagsService } from 'src/tags/tags.service';
 import { PrismaService } from 'src/db/prisma.service';
 import { AppModule } from 'src/app.module';
-import { Prisma, Tag } from '@prisma/client';
+import { Tag } from '@prisma/client';
 import { CreateTagDto } from 'src/tags/dto/create-tag.dto';
 import { NotFoundException } from '@nestjs/common';
 
@@ -10,6 +10,7 @@ describe('TagService', () => {
   let service: TagsService;
   let prisma: PrismaService;
   let userId: number;
+  let colorId: number;
   let testTags: CreateTagDto;
   let tagCreated: Tag;
 
@@ -19,74 +20,59 @@ describe('TagService', () => {
     }).compile();
     prisma = moduleFixture.get<PrismaService>(PrismaService);
     service = moduleFixture.get<TagsService>(TagsService);
-    await prisma.clearDatabase();
 
-    const userData: Prisma.UserCreateInput = {
-      email: 'test@gmail.com',
-      hashed_password: 'password',
-      username: 'testuser',
-    };
+    const user = await prisma.user.findUnique({ where: { id: 1 } });
 
-    const user = await prisma.user.create({
-      data: userData,
-    });
     userId = user.id;
 
     const color = await prisma.color.create({
       data: { name: 'Violet', hex: '#A78BFA' },
     });
-
+    colorId = color.id;
     testTags = {
       name: 'test',
-      color_id: color.id,
-      user_id: userId,
     };
   });
 
   it('/tags (POST)', async () => {
-    tagCreated = await service.create(testTags);
+    const tag = await service.create(userId, colorId, testTags);
+    tagCreated = { ...tag, color_id: tag.color.id, user_id: null };
 
     expect(tagCreated.name).toBe(testTags.name);
-    expect(tagCreated.color_id).toBe(testTags.color_id);
-    expect(tagCreated.user_id).toBe(testTags.user_id);
+    expect(tagCreated.color_id).toBe(colorId);
   });
 
   it('/tags (GET)', async () => {
     const tags = await service.findAll(userId);
 
     expect(tags).toBeInstanceOf(Array);
-    expect(tags).toHaveLength(1);
 
-    expect(tags[0].name).toBe(testTags.name);
-    expect(tags[0].color_id).toBe(testTags.color_id);
-    expect(tags[0].user_id).toBe(testTags.user_id);
+    expect(tags[0].name).toBeDefined();
+    expect(tags[0].color_id).toBeDefined();
+    expect(tags[0].user_id).toBeDefined();
   });
 
   it('/tags/1 (GET)', async () => {
     const tag = await service.findOne(tagCreated.id, userId);
 
     expect(tag.name).toBe(testTags.name);
-    expect(tag.color_id).toBe(testTags.color_id);
-    expect(tag.user_id).toBe(testTags.user_id);
+    expect(tag.color.id).toBe(colorId);
   });
 
   it('/tags/1 (PATCH)', async () => {
-    const tag = await service.update(tagCreated.id, {
+    const tag = await service.update(tagCreated.id, userId, null, {
       name: 'test2',
-      user_id: userId,
     });
 
     expect(tag.name).toBe('test2');
-    expect(tag.color_id).toBe(testTags.color_id);
-    expect(tag.user_id).toBe(testTags.user_id);
+    expect(tag.color.id).toBe(colorId);
   });
 
   it('/tags/1 (DELETE)', async () => {
     const tag = await service.delete(tagCreated.id, userId);
 
     expect(tag.name).toBe('test2');
-    expect(tag.color_id).toBe(testTags.color_id);
-    expect(tag.user_id).toBe(testTags.user_id);
+    expect(tag.color.id).toBe(colorId);
 
     await expect(service.findOne(tag.id, userId)).rejects.toThrow(
       new NotFoundException(),

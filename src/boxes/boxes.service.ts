@@ -54,4 +54,10 @@ export class BoxesService {
       user_id: userId,
     });
   }
+
+  // TODO à revoir en optimisant en mettant le get des steps sur boxstep et limité le nombre de fois ou on appel la box
+  async getBoxWithBoxSteps(boxId: number, userId: number) {
+    const box = await this.findOneBox(boxId, userId);
+    return this.boxRepository.getBoxWithBoxSteps(box.id);
+  }
 }

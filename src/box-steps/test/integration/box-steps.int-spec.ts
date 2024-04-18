@@ -24,7 +24,7 @@ describe('BoxStepsService', () => {
     boxStepsService = moduleRef.get<BoxStepsService>(BoxStepsService);
     boxService = moduleRef.get<BoxesService>(BoxesService);
 
-    await prisma.clearDatabase();
+    prisma.clearDatabase();
     user = await prisma.user.create({
       data: {
         email: 'test@example.com',

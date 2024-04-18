@@ -69,11 +69,11 @@ export class CardsService {
   }
 
   private calculateFutureRevision(interval: number) {
-    return moment().add(interval, 'days').format();
+    return Number(moment().add(interval, 'days').format('x'));
   }
 
   private calculateLastRevision() {
-    return moment().format();
+    return Number(moment().format('x'));
   }
 
   private calculatePositionStep(currentStepBox: BoxStep, BoxSteps: BoxStep[]) {
@@ -166,7 +166,6 @@ export class CardsService {
   listCardRevisions(userId: number) {
     const addOneDay = 1;
     const subtractOneDay = 1;
-
     return this.cardsRepository.findMany({
       AND: [
         {
@@ -174,11 +173,15 @@ export class CardsService {
         },
         {
           future_revision: {
-            lte: moment().add(addOneDay, 'day').startOf('day').format(),
-            gte: moment()
-              .subtract(subtractOneDay, 'days')
-              .startOf('day')
-              .format(),
+            lte: Number(
+              moment().add(addOneDay, 'day').startOf('day').format('x'),
+            ),
+            gte: Number(
+              moment()
+                .subtract(subtractOneDay, 'days')
+                .startOf('day')
+                .format('x'),
+            ),
           },
         },
       ],

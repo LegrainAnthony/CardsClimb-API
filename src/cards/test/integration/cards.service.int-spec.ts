@@ -92,7 +92,7 @@ describe('CardService', () => {
     });
 
     it('should list all revision cards for today', async () => {
-      const generateData = (date: string) => ({
+      const generateData = (date: number) => ({
         question: 'test',
         answer: 'test',
         reference: 'HA_test1',
@@ -107,9 +107,9 @@ describe('CardService', () => {
       const addThreeDays = 3;
 
       await Promise.all([
-        cardsRepository.create(generateData(moment().format())),
+        cardsRepository.create(generateData(Number(moment().format('x')))),
         cardsRepository.create(
-          generateData(moment().add(addThreeDays, 'days').format()),
+          generateData(Number(moment().add(addThreeDays, 'days').format('x'))),
         ),
       ]);
 

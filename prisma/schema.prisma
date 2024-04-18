@@ -31,8 +31,8 @@ model Card {
   reference       String
   question        String
   answer          String?
-  last_revision   DateTime?
-  future_revision DateTime?
+  last_revision   BigInt?
+  future_revision BigInt?
   user            User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
   user_id         Int
   box             Box?      @relation(fields: [box_id], references: [id], onDelete: Cascade)

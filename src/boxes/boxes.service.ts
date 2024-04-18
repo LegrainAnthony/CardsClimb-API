@@ -55,13 +55,13 @@ export class BoxesService {
     });
   }
 
-  //TODO à revoir en optimisant en mettant le get des steps sur boxstep et limité le nombre de fois ou on appel la box
+  // TODO à revoir en optimisant en mettant le get des steps sur boxstep et limité le nombre de fois ou on appel la box
   async getBoxWithBoxSteps(boxId: number, userId: number) {
     try {
-      const box = await this.findOneBox(boxId, userId)
+      const box = await this.findOneBox(boxId, userId);
       return this.boxRepository.getBoxWithBoxSteps(box.id);
     } catch (e) {
-      throw new Error(e)
+      throw new Error(e);
     }
   }
 }

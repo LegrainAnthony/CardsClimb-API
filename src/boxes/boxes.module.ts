@@ -8,6 +8,6 @@ import { BoxesRepository } from './boxes.repository';
   imports: [PrismaModule],
   controllers: [BoxesController],
   providers: [BoxesService, BoxesRepository],
-  exports: [BoxesService]
+  exports: [BoxesService],
 })
 export class BoxesModule {}

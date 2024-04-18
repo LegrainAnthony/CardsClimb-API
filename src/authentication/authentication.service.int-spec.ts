@@ -1,21 +1,17 @@
 import { Test } from '@nestjs/testing';
 import { AppModule } from 'src/app.module';
-import { PrismaService } from 'src/db/prisma.service';
 import { AuthenticationService } from './authentication.service';
 import { SignUpDto } from './dto/sign-up.dto';
-import { hashSync } from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { UnauthorizedException } from '@nestjs/common';
 
 const signUpData: SignUpDto = {
   email: 'test@gmail.com',
   username: 'test',
-  password: 'password',
+  password: 'Password@test1!',
 };
-const salt = 10;
 
 describe('AuthenticationService', () => {
-  let prisma: PrismaService;
   let authenticationService: AuthenticationService;
   let jwtService: JwtService;
 
@@ -24,20 +20,10 @@ describe('AuthenticationService', () => {
       imports: [AppModule],
     }).compile();
 
-    prisma = moduleRef.get<PrismaService>(PrismaService);
     authenticationService = moduleRef.get<AuthenticationService>(
       AuthenticationService,
     );
     jwtService = moduleRef.get<JwtService>(JwtService);
-    await prisma.clearDatabase();
-
-    await prisma.user.create({
-      data: {
-        email: signUpData.email,
-        username: signUpData.username,
-        hashed_password: hashSync(signUpData.password, salt),
-      },
-    });
   });
 
   describe('login', () => {

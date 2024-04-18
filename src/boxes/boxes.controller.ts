@@ -54,6 +54,6 @@ export class BoxesController {
     @Param('id', ParseIntPipe) id: number,
     @ActiveUser() UserId: number,
   ) {
-    return this.boxesService.getBoxWithBoxSteps(id, UserId)
+    return this.boxesService.getBoxWithBoxSteps(id, UserId);
   }
 }

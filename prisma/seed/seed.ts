@@ -8,7 +8,7 @@ import { userSeeder, colorSeeder, cardTypeSeeder, tagSeeder, boxSeeder, boxStepS
 
 const prisma = new PrismaClient()
 
-async function main() {
+export async function main() {
 
   const usersCollection = await userSeeder(prisma);
   const colorsCollection = await colorSeeder(prisma);

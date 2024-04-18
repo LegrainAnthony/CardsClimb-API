@@ -16,8 +16,8 @@ import { CardsService } from './cards.service';
 import { CreateCardDto } from './dto/create-card.dto';
 import { prismaClientHandler } from 'src/common/interceptor';
 import { ActiveUser } from 'src/common/decorators';
-import { UpdateCardDto } from './dto/update-card.dto';
 import { Response } from 'express';
+import { UpdateCardDto } from './dto/update-card.dto';
 
 @Controller('cards')
 @UseInterceptors(prismaClientHandler)
@@ -35,17 +35,17 @@ export class CardsController {
     @Query('cardTypeId', ParseIntPipe) cardTypeId: number,
     @ActiveUser() userId: number,
   ) {
-    return this.cardsService.createCard(card, cardTypeId, userId);
+    return this.cardsService.createCard(card, userId);
   }
 
   @Patch(':id')
   updateOne(
     @Body() datas: UpdateCardDto,
     @Param('id', ParseIntPipe) id: number,
-    @Query('cardTypeId', ParseIntPipe) cardTypeId: number,
+
     @ActiveUser() userId: number,
   ) {
-    return this.cardsService.updateOneCard(id, cardTypeId, userId, datas);
+    return this.cardsService.updateOneCard(id, userId, datas);
   }
 
   @Delete(':id')
@@ -70,8 +70,9 @@ export class CardsController {
   async validateCard(
     @Param('id', ParseIntPipe) id: number,
     @ActiveUser() userId: number,
-  ){
-    return this.cardsService.validateCard(id, userId)
+    @Query('status') status: string,
+  ) {
+    return this.cardsService.validateCard(id, userId, status);
   }
 
   @Get('store-in-box/:id')
@@ -81,6 +82,6 @@ export class CardsController {
     @Query('boxId', ParseIntPipe) boxId: number,
     @Query('boxStepId', ParseIntPipe) boxStepId: number,
   ) {
-    return this.cardsService.StoreCardInBox(id, boxId, boxStepId, userId)
+    return this.cardsService.StoreCardInBox(id, boxId, boxStepId, userId);
   }
 }

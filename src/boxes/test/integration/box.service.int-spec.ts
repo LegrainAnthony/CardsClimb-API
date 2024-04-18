@@ -41,10 +41,6 @@ describe('BoxService', () => {
     expectedBoxesCount++;
   });
 
-  afterAll(async () => {
-    await prisma.clearDatabase();
-  });
-
   it('/boxes (POST)', async () => {
     const createBoxDto: CreateBoxDto = {
       name: 'Another Test Box',

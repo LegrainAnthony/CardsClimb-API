@@ -6,7 +6,7 @@ import { PrismaService } from 'src/db/prisma.service';
 @Injectable()
 export class CardsRepository {
   constructor(
-    private readonly prismaService: PrismaService ,
+    private readonly prismaService: PrismaService,
     // private readonly tagsService: TagsService
   ) {}
 
@@ -43,6 +43,4 @@ export class CardsRepository {
       where: { user_id: userId },
     });
   }
-
-
 }

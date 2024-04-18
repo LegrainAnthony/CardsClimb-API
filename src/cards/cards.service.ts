@@ -3,7 +3,7 @@ import {
   ForbiddenException,
   Injectable,
 } from '@nestjs/common';
-import * as moment from 'moment';
+import * as moment from 'moment-timezone';
 import { CardsRepository } from './cards.repository';
 import { CreateCardDto } from './dto/create-card.dto';
 import { UpdateCardDto } from './dto/update-card.dto';
@@ -69,7 +69,7 @@ export class CardsService {
   }
 
   private calculateFutureRevision(interval: number) {
-    return Number(moment().add(interval, 'days').format('x'));
+    return Number(moment().tz('Asia/Tokyo').add(interval, 'days').format('x'));
   }
 
   private calculateLastRevision() {

@@ -34,7 +34,6 @@ export class CardsController {
   @Post()
   create(
     @Body() card: CreateCardDto,
-    @Query('cardTypeId', ParseIntPipe) cardTypeId: number,
     @ActiveUser() userId: number,
   ) {
     return this.cardsService.createCard(card, userId);
@@ -44,7 +43,6 @@ export class CardsController {
   updateOne(
     @Body() datas: UpdateCardDto,
     @Param('id', ParseIntPipe) id: number,
-
     @ActiveUser() userId: number,
   ) {
     return this.cardsService.updateOneCard(id, userId, datas);
@@ -64,7 +62,8 @@ export class CardsController {
   }
 
   @Get()
-  AllCardsFromUser(@ActiveUser() userId: number) {
+  AllCardsFromUser(
+    @ActiveUser() userId: number) {
     return this.cardsService.findAllFromUser(userId);
   }
 
@@ -77,16 +76,22 @@ export class CardsController {
     return this.cardsService.validateCard(id, userId, status);
   }
 
-  @Get('store-in-box/:id')
+  @Post('store-in-box/:id')
   async storeInBox(
-    @Param() { id, boxId, boxStepId }: StoreInBoxParamDto,
+    @Param('id', ParseIntPipe) id : number,
+    @Body() datas : StoreInBoxParamDto,
     @ActiveUser() userId: number,
   ) {
-    return this.cardsService.StoreCardInBox(id, boxId, boxStepId, userId);
+    return this.cardsService.StoreCardInBox(id, datas, userId);
   }
 
-  @Get('user/revision')
+  @Get('user/revision-of-day')
   listCardRevisions(@ActiveUser() userId: number) {
     return this.cardsService.listCardRevisions(userId);
+  }
+
+  @Get('user/late-revision')
+  listCardLateRevisions(@ActiveUser() userId: number) {
+    return this.cardsService.listCardLateRevisions(userId);
   }
 }

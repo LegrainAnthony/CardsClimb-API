@@ -9,6 +9,7 @@ import { CreateCardDto } from './dto/create-card.dto';
 import { UpdateCardDto } from './dto/update-card.dto';
 import { BoxesService } from 'src/boxes/boxes.service';
 import { BoxStep, Prisma } from '@prisma/client';
+import { StoreInBoxParamDto } from './dto/param.dto';
 
 @Injectable()
 export class CardsService {
@@ -145,10 +146,10 @@ export class CardsService {
 
   async StoreCardInBox(
     cardId: number,
-    boxId: number,
-    boxStepId: number,
+    datas: StoreInBoxParamDto,
     userId: number,
   ) {
+    const { boxId, boxStepId } = datas
     const card = await this.findOneCard(cardId, userId);
     const box = await this.boxesService.getBoxWithBoxSteps(boxId, userId);
     const currentBoxStep =
@@ -187,4 +188,28 @@ export class CardsService {
       ],
     });
   }
+
+  listCardLateRevisions(userId: number) {
+    const subtractTwoDay = 2;
+    return this.cardsRepository.findMany({
+      AND: [
+        {
+          user_id: userId,
+        },
+        {
+          future_revision: {
+            lte: Number(
+              moment()
+                .subtract(subtractTwoDay, 'days')
+                .startOf('day')
+                .format('x'),
+            ),
+          },
+        },
+      ]
+    })
+  }
+
 }
+
+

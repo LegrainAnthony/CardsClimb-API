@@ -26,7 +26,7 @@ export class TagsRepository {
         id: true,
         name: true,
         color: true,
-        user_id: true 
+        user_id: true,
       },
     });
   }

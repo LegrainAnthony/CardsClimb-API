@@ -43,7 +43,7 @@ jobs:
           POSTGRES_USER_TEST: 'cardclimb-test'
           REDIS_HOST: 'localhost'
           REDIS_PORT: 6379
-          REDIS_NUMBER: 0
+          REDIS_DB: 0
       - run: npm ci
       - run: npm run test:int
         env:

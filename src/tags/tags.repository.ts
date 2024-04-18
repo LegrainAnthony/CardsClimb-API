@@ -11,11 +11,6 @@ export class TagsRepository {
       where: {
         user_id: userId,
       },
-      select: {
-        id: true,
-        name: true,
-        color: true,
-      },
     });
   }
 
@@ -31,6 +26,7 @@ export class TagsRepository {
         id: true,
         name: true,
         color: true,
+        user_id: true 
       },
     });
   }
@@ -42,6 +38,7 @@ export class TagsRepository {
         id: true,
         name: true,
         color: true,
+        user_id: true,
       },
     });
   }
@@ -53,6 +50,7 @@ export class TagsRepository {
         id: true,
         name: true,
         color: true,
+        user_id: true,
       },
     });
   }
@@ -68,6 +66,7 @@ export class TagsRepository {
         id: true,
         name: true,
         color: true,
+        user_id: true,
       },
     });
   }
@@ -79,6 +78,7 @@ export class TagsRepository {
         id: true,
         name: true,
         color: true,
+        user_id: true,
       },
     });
   }

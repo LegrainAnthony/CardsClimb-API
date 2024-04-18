@@ -1,7 +1,7 @@
 import { BadRequestException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { Card, CardType, User } from '@prisma/client';
-import * as moment from 'moment';
+import * as moment from 'moment-timezone';
 import { AppModule } from 'src/app.module';
 import { CardsRepository } from 'src/cards/cards.repository';
 import { CardsService } from 'src/cards/cards.service';

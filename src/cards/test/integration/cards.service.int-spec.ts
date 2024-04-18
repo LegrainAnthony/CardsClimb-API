@@ -1,6 +1,6 @@
 import { BadRequestException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import { Card, CardType, Prisma, User } from '@prisma/client';
+import { Card, CardType, User } from '@prisma/client';
 import { AppModule } from 'src/app.module';
 import { CardsService } from 'src/cards/cards.service';
 import { CreateCardDto } from 'src/cards/dto/create-card.dto';
@@ -19,24 +19,13 @@ describe('CardService', () => {
 
     prisma = moduleRef.get<PrismaService>(PrismaService);
     CardService = moduleRef.get<CardsService>(CardsService);
-    await prisma.clearDatabase();
 
-    const userData: Prisma.UserCreateInput = {
-      email: 'test@gmail.com',
-      hashed_password: 'password',
-      username: 'testuser',
-    };
-
-    const cardTypeData: Prisma.CardTypeCreateInput = {
-      name: 'flash',
-    };
-
-    cardType = await prisma.cardType.create({
-      data: cardTypeData,
+    cardType = await prisma.cardType.findUnique({
+      where: { id: 1 },
     });
 
-    user = await prisma.user.create({
-      data: userData,
+    user = await prisma.user.findFirst({
+      where: { id: 1 },
     });
   });
 
@@ -47,14 +36,12 @@ describe('CardService', () => {
       question: 'test',
       answer: 'test',
       reference: 'HA_test1',
+      tagIds: [1],
+      cardTypeId: 1,
     };
 
     it('/cards (Post)', async () => {
-      cardCreated = await CardService.createCard(
-        cardData,
-        cardType.id,
-        user.id,
-      );
+      cardCreated = await CardService.createCard(cardData, user.id);
       expect(cardCreated.id).toBeDefined();
       expect(cardCreated.question).toBe(cardData.question);
       expect(cardCreated.reference).toBe(cardData.reference);
@@ -74,10 +61,11 @@ describe('CardService', () => {
     it('/cards/1 (PATCH)', async () => {
       const cardDataToUpdate = {
         question: 'Modified',
+        tagIds: [1],
+        cardTypeId: 1,
       };
       const card = await CardService.updateOneCard(
         cardCreated.id,
-        cardType.id,
         user.id,
         cardDataToUpdate,
       );

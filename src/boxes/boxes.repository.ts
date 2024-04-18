@@ -39,4 +39,15 @@ export class BoxesRepository {
       where,
     });
   }
+
+  async getBoxWithBoxSteps(id: number) {
+    const boxWithSteps = await this.prismaService.box.findUnique({
+      where: { id },
+      include: {
+        box_steps: true,
+      },
+    });
+
+    return boxWithSteps;
+  }
 }

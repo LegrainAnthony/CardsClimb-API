@@ -1,4 +1,10 @@
-import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
+import {
+  IsArray,
+  IsNumber,
+  IsString,
+  IsNotEmpty,
+  IsOptional,
+} from 'class-validator';
 
 export class CreateCardDto {
   @IsString()
@@ -12,4 +18,12 @@ export class CreateCardDto {
   @IsString()
   @IsOptional()
   answer: string;
+
+  @IsArray()
+  @IsNumber({}, { each: true })
+  tagIds: number[];
+
+  @IsNumber()
+  @IsNotEmpty()
+  cardTypeId: number;
 }

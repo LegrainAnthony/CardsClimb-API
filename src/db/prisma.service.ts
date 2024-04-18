@@ -17,21 +17,22 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
     await this.$connect();
   }
 
-  async clearDatabase() {
-    if (process.env.NODE_ENV === 'test') {
-      await this.card.deleteMany();
+  // async clearDatabase() {
+  //   if (process.env.NODE_ENV === 'test') {
+  //     await this.card.deleteMany();
 
-      await this.boxStep.deleteMany();
+  //     await this.boxStep.deleteMany();
 
-      await this.tag.deleteMany();
+  //     await this.tag.deleteMany();
 
-      await this.box.deleteMany();
+  //     await this.box.deleteMany();
 
-      await this.cardType.deleteMany();
+  //     await this.cardType.deleteMany();
 
-      await this.user.deleteMany();
+  //     await this.user.deleteMany();
 
-      await this.color.deleteMany();
-    }
-  }
+  //     await this.color.deleteMany();
+
+  //   }
+  // }
 }

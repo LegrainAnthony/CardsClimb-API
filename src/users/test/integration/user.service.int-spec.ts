@@ -14,13 +14,12 @@ describe('UserService', () => {
 
     prisma = moduleRef.get<PrismaService>(PrismaService);
     UserService = moduleRef.get<UsersService>(UsersService);
-    await prisma.clearDatabase();
   });
 
   describe('create', () => {
     let userId: number;
     const userData: Prisma.UserCreateInput = {
-      email: 'test@gmail.com',
+      email: 'test3@gmail.com',
       hashed_password: 'password',
       username: 'testuser',
     };

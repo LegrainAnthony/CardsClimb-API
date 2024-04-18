@@ -83,4 +83,9 @@ export class CardsController {
   ) {
     return this.cardsService.StoreCardInBox(id, boxId, boxStepId, userId);
   }
+
+  @Get('user/revision')
+  listCardRevisions(@ActiveUser() userId: number) {
+    return this.cardsService.listCardRevisions(userId);
+  }
 }

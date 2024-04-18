@@ -65,7 +65,7 @@ export class CardsService {
   }
 
   findAllFromUser(userId: number) {
-    return this.cardsRepository.findAll(userId);
+    return this.cardsRepository.findMany({ user_id: userId });
   }
 
   private calculateFutureRevision(interval: number) {
@@ -161,5 +161,27 @@ export class CardsService {
     };
 
     return this.cardsRepository.updateOne(card, updatedData);
+  }
+
+  listCardRevisions(userId: number) {
+    const addTwoHours = 2;
+    const addOneDay = 1;
+    return this.cardsRepository.findMany({
+      AND: [
+        {
+          user_id: userId,
+        },
+        {
+          future_revision: {
+            lte: moment()
+              .add(addOneDay, 'day')
+              .startOf('day')
+              .add(addTwoHours, 'hours')
+              .format(),
+            gte: moment().startOf('day').format(),
+          },
+        },
+      ],
+    });
   }
 }

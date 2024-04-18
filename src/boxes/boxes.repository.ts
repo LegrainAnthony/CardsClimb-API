@@ -47,6 +47,7 @@ export class BoxesRepository {
         box_steps: true,
       },
     });
+
     return boxWithSteps;
   }
 }

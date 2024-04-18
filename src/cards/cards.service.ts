@@ -53,9 +53,7 @@ export class CardsService {
       card_type: { connect: { id: cardTypeId } },
       tags: {
         set: [],
-        connect: tagIds.map((tagId) => {
-          return { id: tagId };
-        }),
+        connect: tagIds.map((tagId) => ({ id: tagId })),
       },
     };
     return this.cardsRepository.updateOne({ id }, updatedData);
@@ -108,7 +106,11 @@ export class CardsService {
     };
   }
 
-  async validateCard(cardId: number, userId: number, status: string) {
+  async validateCard(
+    cardId: number,
+    userId: number,
+    status: 'failled' | 'passed',
+  ) {
     const card = await this.findOneCard(cardId, userId);
 
     if (!card.box_id) throw new BadRequestException();

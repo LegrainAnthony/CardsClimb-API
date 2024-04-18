@@ -18,6 +18,7 @@ import { prismaClientHandler } from 'src/common/interceptor';
 import { ActiveUser } from 'src/common/decorators';
 import { Response } from 'express';
 import { UpdateCardDto } from './dto/update-card.dto';
+import { StoreInBoxParamDto } from './dto/param.dto';
 
 @Controller('cards')
 @UseInterceptors(prismaClientHandler)
@@ -70,17 +71,15 @@ export class CardsController {
   async validateCard(
     @Param('id', ParseIntPipe) id: number,
     @ActiveUser() userId: number,
-    @Query('status') status: string,
+    @Query('status') status: 'failled' | 'passed',
   ) {
     return this.cardsService.validateCard(id, userId, status);
   }
 
   @Get('store-in-box/:id')
   async storeInBox(
-    @Param('id', ParseIntPipe) id: number,
+    @Param() { id, boxId, boxStepId }: StoreInBoxParamDto,
     @ActiveUser() userId: number,
-    @Query('boxId', ParseIntPipe) boxId: number,
-    @Query('boxStepId', ParseIntPipe) boxStepId: number,
   ) {
     return this.cardsService.StoreCardInBox(id, boxId, boxStepId, userId);
   }

@@ -80,7 +80,7 @@ describe('CardService', () => {
       expect(card.card_type_id).toBe(cardType.id);
     });
 
-    it('/tags/1 (delete)', async () => {
+    it('/cards/1 (delete)', async () => {
       let card;
       try {
         card = await cardsService.deleteOneCard(cardCreated.id, user.id);
@@ -104,15 +104,12 @@ describe('CardService', () => {
         future_revision: date,
       });
 
-      const addTwoHours = 2;
-      const addTwoDays = 2;
+      const addThreeDays = 3;
 
       await Promise.all([
+        cardsRepository.create(generateData(moment().format())),
         cardsRepository.create(
-          generateData(moment().add(addTwoHours, 'hours').format()),
-        ),
-        cardsRepository.create(
-          generateData(moment().add(addTwoDays, 'days').format()),
+          generateData(moment().add(addThreeDays, 'days').format()),
         ),
       ]);
 

@@ -164,8 +164,9 @@ export class CardsService {
   }
 
   listCardRevisions(userId: number) {
-    const addTwoHours = 2;
     const addOneDay = 1;
+    const subtractOneDay = 1;
+
     return this.cardsRepository.findMany({
       AND: [
         {
@@ -173,12 +174,11 @@ export class CardsService {
         },
         {
           future_revision: {
-            lte: moment()
-              .add(addOneDay, 'day')
+            lte: moment().add(addOneDay, 'day').startOf('day').format(),
+            gte: moment()
+              .subtract(subtractOneDay, 'days')
               .startOf('day')
-              .add(addTwoHours, 'hours')
               .format(),
-            gte: moment().startOf('day').format(),
           },
         },
       ],

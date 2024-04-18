@@ -1,14 +1,17 @@
 import { BadRequestException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { Card, CardType, User } from '@prisma/client';
+import * as moment from 'moment';
 import { AppModule } from 'src/app.module';
+import { CardsRepository } from 'src/cards/cards.repository';
 import { CardsService } from 'src/cards/cards.service';
 import { CreateCardDto } from 'src/cards/dto/create-card.dto';
 import { PrismaService } from 'src/db/prisma.service';
 
 describe('CardService', () => {
   let prisma: PrismaService;
-  let CardService: CardsService;
+  let cardsService: CardsService;
+  let cardsRepository: CardsRepository;
   let user: User | null = null;
   let cardType: CardType;
 
@@ -18,7 +21,8 @@ describe('CardService', () => {
     }).compile();
 
     prisma = moduleRef.get<PrismaService>(PrismaService);
-    CardService = moduleRef.get<CardsService>(CardsService);
+    cardsService = moduleRef.get<CardsService>(CardsService);
+    cardsRepository = moduleRef.get<CardsRepository>(CardsRepository);
 
     cardType = await prisma.cardType.findUnique({
       where: { id: 1 },
@@ -41,7 +45,7 @@ describe('CardService', () => {
     };
 
     it('/cards (Post)', async () => {
-      cardCreated = await CardService.createCard(cardData, user.id);
+      cardCreated = await cardsService.createCard(cardData, user.id);
       expect(cardCreated.id).toBeDefined();
       expect(cardCreated.question).toBe(cardData.question);
       expect(cardCreated.reference).toBe(cardData.reference);
@@ -50,7 +54,7 @@ describe('CardService', () => {
     });
 
     it('/cards/1 (GET)', async () => {
-      const card = await CardService.findOneCard(cardCreated.id, user.id);
+      const card = await cardsService.findOneCard(cardCreated.id, user.id);
       expect(card.id).toBeDefined();
       expect(card.question).toBe(cardData.question);
       expect(card.reference).toBe(cardData.reference);
@@ -64,7 +68,7 @@ describe('CardService', () => {
         tagIds: [1],
         cardTypeId: 1,
       };
-      const card = await CardService.updateOneCard(
+      const card = await cardsService.updateOneCard(
         cardCreated.id,
         user.id,
         cardDataToUpdate,
@@ -79,12 +83,42 @@ describe('CardService', () => {
     it('/tags/1 (delete)', async () => {
       let card;
       try {
-        card = await CardService.deleteOneCard(cardCreated.id, user.id);
-        await CardService.findOneCard(1, user.id);
+        card = await cardsService.deleteOneCard(cardCreated.id, user.id);
+        await cardsService.findOneCard(1, user.id);
       } catch (e) {
         expect(card.answer).toBe(cardData.answer);
         expect(e).toBeInstanceOf(BadRequestException);
       }
+    });
+
+    it('should list all revision cards for today', async () => {
+      const generateData = (date: string) => ({
+        question: 'test',
+        answer: 'test',
+        reference: 'HA_test1',
+        card_type: { connect: { id: 1 } },
+        user: { connect: { id: user.id } },
+        tags: {
+          connect: [{ id: 1 }],
+        },
+        future_revision: date,
+      });
+
+      const addTwoHours = 2;
+      const addTwoDays = 2;
+
+      await Promise.all([
+        cardsRepository.create(
+          generateData(moment().add(addTwoHours, 'hours').format()),
+        ),
+        cardsRepository.create(
+          generateData(moment().add(addTwoDays, 'days').format()),
+        ),
+      ]);
+
+      const cards = await cardsService.listCardRevisions(user.id);
+
+      expect(cards.length).toBe(1);
     });
   });
 });

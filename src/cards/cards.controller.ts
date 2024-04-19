@@ -19,9 +19,10 @@ import { ActiveUser } from 'src/common/decorators';
 import { Response } from 'express';
 import { UpdateCardDto } from './dto/update-card.dto';
 import { StoreInBoxParamDto } from './dto/param.dto';
+import { ParseBigIntInterceptor } from 'src/common/interceptor/parse-bigint.interceptor';
 
 @Controller('cards')
-@UseInterceptors(prismaClientHandler)
+@UseInterceptors(prismaClientHandler, ParseBigIntInterceptor)
 export class CardsController {
   constructor(private readonly cardsService: CardsService) {}
 
@@ -82,5 +83,10 @@ export class CardsController {
     @ActiveUser() userId: number,
   ) {
     return this.cardsService.StoreCardInBox(id, boxId, boxStepId, userId);
+  }
+
+  @Get('user/revision')
+  listCardRevisions(@ActiveUser() userId: number) {
+    return this.cardsService.listCardRevisions(userId);
   }
 }

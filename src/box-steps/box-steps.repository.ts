@@ -7,10 +7,11 @@ import { PrismaService } from 'src/db/prisma.service';
 export class BoxStepsRepository {
   constructor(private readonly prismaService: PrismaService) {}
 
-  createBoxStep(data: CreateBoxStepsDto, boxId: number, order: number) {
+  createBoxStep(data: CreateBoxStepsDto, order: number) {
+    const { boxId, ...rest } = data;
     return this.prismaService.boxStep.create({
       data: {
-        ...data,
+        ...rest,
         box: {
           connect: { id: boxId },
         },

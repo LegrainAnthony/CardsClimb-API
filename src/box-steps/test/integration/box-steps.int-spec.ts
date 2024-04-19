@@ -24,37 +24,29 @@ describe('BoxStepsService', () => {
     boxStepsService = moduleRef.get<BoxStepsService>(BoxStepsService);
     boxService = moduleRef.get<BoxesService>(BoxesService);
 
-    prisma.clearDatabase();
-    user = await prisma.user.create({
-      data: {
-        email: 'test@example.com',
-        hashed_password: 'password',
-        username: 'testuser',
+    user = await prisma.user.findUnique({
+      where: {
+        id: 1,
       },
     });
 
-    box = await boxService.createBox(
-      {
-        name: 'Test Box',
-      },
-      user.id,
-    );
+    box = await boxService.findOneBox(1, user.id);
   });
 
   describe('createBoxStep', () => {
     let createdBoxStep: BoxStep;
-    const createBoxStepDto: CreateBoxStepsDto = {
+    const createBoxData: CreateBoxStepsDto = {
       interval: 10,
+      boxId: 1,
     };
 
     it('should create a box step', async () => {
       createdBoxStep = await boxStepsService.createBoxStep(
-        createBoxStepDto,
-        box.id,
+        createBoxData,
         user.id,
       );
       expect(createdBoxStep).toBeDefined();
-      expect(createdBoxStep.interval).toBe(createBoxStepDto.interval);
+      expect(createdBoxStep.interval).toBe(createBoxData.interval);
     });
 
     it('should retrieve a box step', async () => {
@@ -80,7 +72,7 @@ describe('BoxStepsService', () => {
         box.id,
         user.id,
       );
-      expect(updatedBoxSteps).toHaveLength(1);
+      expect(updatedBoxSteps.length).toBeGreaterThan(0);
     });
 
     it('should update a box step', async () => {

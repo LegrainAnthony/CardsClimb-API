@@ -21,10 +21,7 @@ export class BoxStepsController {
   constructor(private readonly boxStepService: BoxStepsService) {}
 
   @Post()
-  create(
-    @Body() datas: CreateBoxStepsDto,
-    @ActiveUser() userId: number,
-  ) {
+  create(@Body() datas: CreateBoxStepsDto, @ActiveUser() userId: number) {
     return this.boxStepService.createBoxStep(datas, userId);
   }
 

@@ -13,12 +13,16 @@ export class BoxStepsService {
   ) {}
 
   async createBoxStep(datas: CreateBoxStepsDto, userId: number) {
-    const { boxId } = datas
+    const { boxId, interval } = datas;
     const box = await this.boxesService.findOneBox(boxId, userId);
     const boxSteps = await this.findAllBoxSteps(box.id);
-    const order = boxSteps.length + 1
+    const order = boxSteps.length + 1;
+    const CreateData = {
+      boxId: box.id,
+      interval,
+    };
 
-    return this.boxStepRepository.createBoxStep(datas, box.id, order);
+    return this.boxStepRepository.createBoxStep(CreateData, order);
   }
 
   async findOneBoxWithBoxStep(id: number, boxId: number, userId: number) {

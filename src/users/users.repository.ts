@@ -12,9 +12,18 @@ export class UsersRepository {
     });
   }
 
-  findOne(userWhereUniqueInput: Prisma.UserWhereInput) {
+  findOne(where: Prisma.UserWhereInput, select?: Prisma.UserSelect) {
     return this.prismaService.user.findFirst({
-      where: userWhereUniqueInput,
+      where,
+      select,
+    });
+  }
+
+  findOneWithoutPassword(userWhereUniqueInput: Prisma.UserWhereInput) {
+    return this.findOne(userWhereUniqueInput, {
+      id: true,
+      email: true,
+      username: true,
     });
   }
 }

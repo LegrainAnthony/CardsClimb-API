@@ -10,12 +10,14 @@ import { CreateCardDto } from './dto/create-card.dto';
 import { UpdateCardDto } from './dto/update-card.dto';
 import { BoxesService } from 'src/boxes/boxes.service';
 import { BoxStep, Prisma } from '@prisma/client';
+import { FilterService } from 'src/filter/filter.service';
 
 @Injectable()
 export class CardsService {
   constructor(
     private readonly cardsRepository: CardsRepository,
     private readonly boxesService: BoxesService,
+    private readonly filterService: FilterService,
   ) {}
 
   createCard(data: CreateCardDto, userId: number) {
@@ -164,6 +166,7 @@ export class CardsService {
     const box = await this.boxesService.getBoxWithBoxSteps(boxId, userId);
     const currentBoxStep =
       this.getCurrentBoxStep(boxStepId, box.box_steps) || box.box_steps[0];
+      await this.filterService.test();
 
     const updatedData: Prisma.CardUpdateInput = {
       box: { connect: { id: box.id } },

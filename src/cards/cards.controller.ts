@@ -77,7 +77,7 @@ export class CardsController {
     return this.cardsService.validateCard(id, userId, status);
   }
 
-  @Get('store-in-box/:id')
+  @Post('store-in-box/:id/:boxId/:boxStepId')
   async storeInBox(
     @Param() { id, boxId, boxStepId }: StoreInBoxParamDto,
     @ActiveUser() userId: number,

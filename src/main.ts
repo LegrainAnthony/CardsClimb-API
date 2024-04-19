@@ -14,6 +14,7 @@ async function bootstrap() {
 
   // app.useGlobalGuards(new AuthGuard(new Reflector(), new JwtService()));
 
-  await app.listen(process.env.PORT);
+  const defaultPort = 8080;
+  await app.listen(process.env.PORT || defaultPort);
 }
 void bootstrap();

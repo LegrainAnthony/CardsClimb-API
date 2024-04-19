@@ -1,3 +1,4 @@
+import { NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { Prisma } from '@prisma/client';
 import { AppModule } from 'src/app.module';
@@ -37,6 +38,8 @@ describe('UserService', () => {
 
     it('should get a user', async () => {
       const user = await UserService.findOne(userId);
+
+      if (!user) throw new NotFoundException('User not found');
 
       expect(user.email).toBe(userData.email);
       expect(user.username).toBe(userData.username);

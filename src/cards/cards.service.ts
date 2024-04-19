@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ForbiddenException,
   Injectable,
+  NotFoundException,
 } from '@nestjs/common';
 import * as moment from 'moment-timezone';
 import { CardsRepository } from './cards.repository';
@@ -53,7 +54,7 @@ export class CardsService {
       card_type: { connect: { id: cardTypeId } },
       tags: {
         set: [],
-        connect: tagIds.map((tagId) => ({ id: tagId })),
+        connect: tagIds?.map((tagId) => ({ id: tagId })),
       },
     };
     return this.cardsRepository.updateOne({ id }, updatedData);
@@ -80,8 +81,11 @@ export class CardsService {
     return BoxSteps.find((box) => currentStepBox.order + 1 === box.order);
   }
 
-  private getCurrentBoxStep(currentStepBox: number, BoxSteps: BoxStep[]) {
-    return BoxSteps.find((box) => box.id === currentStepBox);
+  private getCurrentBoxStep(
+    currentStepBoxId: number | null,
+    BoxSteps: BoxStep[],
+  ) {
+    return BoxSteps.find((box) => box.id === currentStepBoxId);
   }
 
   private passedCard(boxId: number, futureBoxStep: BoxStep) {
@@ -120,10 +124,17 @@ export class CardsService {
       card.box_step_id,
       box.box_steps,
     );
+
+    if (!currentBoxStep)
+      throw new NotFoundException('current box step not found');
+
     const futureBoxStep = this.calculatePositionStep(
       currentBoxStep,
       box.box_steps,
     );
+
+    if (!futureBoxStep)
+      throw new NotFoundException('future box step not found');
 
     let updatedData: Prisma.CardUpdateInput;
 

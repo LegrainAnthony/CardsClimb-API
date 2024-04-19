@@ -5,15 +5,15 @@ export class StoreInBoxParamDto {
   @IsNumber()
   @IsNotEmpty()
   @Transform(({ value }) => parseInt(value, 10))
-  boxId: number;
+  boxId!: number;
 
   @IsNumber()
   @IsNotEmpty()
   @Transform(({ value }) => parseInt(value, 10))
-  boxStepId: number;
+  boxStepId!: number;
 
   @IsNumber()
   @IsNotEmpty()
   @Transform(({ value }) => parseInt(value, 10))
-  id: number;
+  id!: number;
 }

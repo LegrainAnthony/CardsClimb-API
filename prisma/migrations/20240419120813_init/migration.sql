@@ -4,6 +4,8 @@ CREATE TABLE "User" (
     "username" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "hashed_password" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
@@ -13,6 +15,8 @@ CREATE TABLE "Box" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
     "user_id" INTEGER NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Box_pkey" PRIMARY KEY ("id")
 );
@@ -29,6 +33,8 @@ CREATE TABLE "Card" (
     "box_id" INTEGER,
     "box_step_id" INTEGER,
     "card_type_id" INTEGER NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Card_pkey" PRIMARY KEY ("id")
 );
@@ -39,6 +45,8 @@ CREATE TABLE "Tag" (
     "name" TEXT NOT NULL,
     "color_id" INTEGER NOT NULL,
     "user_id" INTEGER NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Tag_pkey" PRIMARY KEY ("id")
 );
@@ -47,6 +55,8 @@ CREATE TABLE "Tag" (
 CREATE TABLE "CardType" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "CardType_pkey" PRIMARY KEY ("id")
 );
@@ -57,6 +67,8 @@ CREATE TABLE "BoxStep" (
     "interval" INTEGER NOT NULL,
     "order" INTEGER NOT NULL,
     "box_id" INTEGER NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "BoxStep_pkey" PRIMARY KEY ("id")
 );
@@ -66,6 +78,8 @@ CREATE TABLE "Color" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
     "hex" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Color_pkey" PRIMARY KEY ("id")
 );

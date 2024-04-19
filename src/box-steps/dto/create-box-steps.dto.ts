@@ -5,7 +5,7 @@ export class CreateBoxStepsDto {
   @IsNumber()
   interval: number;
 
-  // @IsNotEmpty()
-  // @IsNumber()
-  // boxId: number;
+  @IsNotEmpty()
+  @IsNumber()
+  boxId: number;
 }

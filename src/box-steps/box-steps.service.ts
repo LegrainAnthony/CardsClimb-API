@@ -7,22 +7,18 @@ import { BoxStep } from '@prisma/client';
 
 @Injectable()
 export class BoxStepsService {
-  // findMany(ids: number[], userId: number) {
-  //   throw new Error('Method not implemented.');
-  // }
   constructor(
     private readonly boxStepRepository: BoxStepsRepository,
     private readonly boxesService: BoxesService,
   ) {}
 
-  // TODO faire un createMany pour créer plusieurs step à la creation de la boite
-
-  async createBoxStep(data: CreateBoxStepsDto, boxId: number, userId: number) {
+  async createBoxStep(datas: CreateBoxStepsDto, userId: number) {
+    const { boxId } = datas
     const box = await this.boxesService.findOneBox(boxId, userId);
     const boxSteps = await this.findAllBoxSteps(box.id);
-    const order = boxSteps.length + 1;
+    const order = boxSteps.length + 1
 
-    return this.boxStepRepository.createBoxStep(data, box.id, order);
+    return this.boxStepRepository.createBoxStep(datas, box.id, order);
   }
 
   async findOneBoxWithBoxStep(id: number, boxId: number, userId: number) {
@@ -47,8 +43,6 @@ export class BoxStepsService {
     const boxSteps = await this.boxStepRepository.findManyBoxSteps(ids, userId);
     return boxSteps;
   }
-
-  // TODO Créer méthode pour récupérer plusieurs boxSteps avec un tableaux d'id
 
   async findManyByIds(ids: number[]) {
     return this.boxStepRepository.findManyBoxStepsByIds(ids);
@@ -86,9 +80,7 @@ export class BoxStepsService {
 
   async updateOrderBoxSteps(ids: number[], boxId: number, userId: number) {
     const box = await this.boxesService.findOneBox(boxId, userId);
-    const existingBoxSteps = await this.boxStepRepository.findAllBoxStepsForBox(
-      { box_id: box.id },
-    );
+    const existingBoxSteps = await this.findAllBoxSteps(box.id);
     const existingId = this.convertBoxStepsToIds(existingBoxSteps);
     const commonIds = ids.filter((id) => existingId.includes(id));
     const modifiedId = [...new Set([...commonIds, ...existingId])];

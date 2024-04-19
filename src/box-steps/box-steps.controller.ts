@@ -22,11 +22,10 @@ export class BoxStepsController {
 
   @Post()
   create(
-    @Body() createBoxStepsDto: CreateBoxStepsDto,
-    @Query('boxId', ParseIntPipe) boxId: number,
+    @Body() datas: CreateBoxStepsDto,
     @ActiveUser() userId: number,
   ) {
-    return this.boxStepService.createBoxStep(createBoxStepsDto, boxId, userId);
+    return this.boxStepService.createBoxStep(datas, userId);
   }
 
   @Get(':id')
@@ -36,20 +35,6 @@ export class BoxStepsController {
     @ActiveUser() userId: number,
   ) {
     return this.boxStepService.findOneBoxStep(id, boxId, userId);
-  }
-
-  @Get('list')
-  findMany(
-    @ActiveUser() userId: number,
-    @Query('ids', new ParseArrayPipe({ separator: ',', items: Number }))
-    ids: number[],
-  ) {
-    return this.boxStepService.findManyByIds(ids);
-  }
-
-  @Get()
-  findAllForUser(@Query('boxId', ParseIntPipe) boxId: number) {
-    return this.boxStepService.findAllBoxSteps(boxId);
   }
 
   @Get('listByIds')

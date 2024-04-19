@@ -45,11 +45,7 @@ export class AuthenticationService {
       hashed_password: hashedPassword,
     });
 
-    const payload = { username: userCreated.username, sub: userCreated.id };
-
-    return {
-      accessToken: await this.jwtService.signAsync(payload),
-    };
+    return this.generateTokens(userCreated);
   }
 
   async signIn(user: signIn) {
@@ -69,6 +65,18 @@ export class AuthenticationService {
     }
 
     return this.generateTokens(userFound);
+  }
+
+  async me(userId: number) {
+    const user = await this.userRepository.findOneWithoutPassword({
+      id: userId,
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return user;
   }
 
   async generateTokens(user: User) {

@@ -7,7 +7,7 @@ import { UnauthorizedException } from '@nestjs/common';
 
 const signUpData: SignUpDto = {
   email: 'test@gmail.com',
-  username: 'test',
+  username: 'Test',
   password: 'Password@test1!',
 };
 
@@ -109,6 +109,20 @@ describe('AuthenticationService', () => {
           expect(e.getStatus()).toBe(unauthorizedStatus);
         }
       }
+    });
+
+    it('should get the current user', async () => {
+      const user = await authenticationService.signIn({
+        email: signUpData.email,
+        password: signUpData.password,
+      });
+
+      const { sub } = jwtService.decode(user.accessToken) as { sub: number };
+
+      const currentUser = await authenticationService.me(sub);
+
+      expect(currentUser.email).toBe(signUpData.email);
+      expect(currentUser.username).toBe(signUpData.username);
     });
   });
 });

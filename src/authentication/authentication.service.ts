@@ -108,6 +108,9 @@ export class AuthenticationService {
       const user = await this.userRepository.findOne({
         id: sub,
       });
+
+      if (!user) throw new NotFoundException('User not found');
+
       // Vérfier si l'id du refresh token est valide, si ce n'est pas le cas
       // il est fort possible que le payload du token ait été modifié
       const isValid = await this.refreshTokenIdsStorage.validate(

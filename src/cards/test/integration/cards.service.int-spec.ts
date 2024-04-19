@@ -13,7 +13,7 @@ describe('CardService', () => {
   let cardsService: CardsService;
   let cardsRepository: CardsRepository;
   let user: User | null = null;
-  let cardType: CardType;
+  let cardType: CardType | null = null;
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -45,6 +45,9 @@ describe('CardService', () => {
     };
 
     it('/cards (Post)', async () => {
+      if (!user) throw new BadRequestException('User not found');
+      if (!cardType) throw new BadRequestException('CardType not found');
+
       cardCreated = await cardsService.createCard(cardData, user.id);
       expect(cardCreated.id).toBeDefined();
       expect(cardCreated.question).toBe(cardData.question);
@@ -54,6 +57,9 @@ describe('CardService', () => {
     });
 
     it('/cards/1 (GET)', async () => {
+      if (!user) throw new BadRequestException('User not found');
+      if (!cardType) throw new BadRequestException('CardType not found');
+
       const card = await cardsService.findOneCard(cardCreated.id, user.id);
       expect(card.id).toBeDefined();
       expect(card.question).toBe(cardData.question);
@@ -63,6 +69,8 @@ describe('CardService', () => {
     });
 
     it('/cards/1 (PATCH)', async () => {
+      if (!user) throw new BadRequestException('User not found');
+      if (!cardType) throw new BadRequestException('CardType not found');
       const cardDataToUpdate = {
         question: 'Modified',
         tagIds: [1],
@@ -81,6 +89,8 @@ describe('CardService', () => {
     });
 
     it('/cards/1 (delete)', async () => {
+      if (!user) throw new BadRequestException('User not found');
+      if (!cardType) throw new BadRequestException('CardType not found');
       let card;
       try {
         card = await cardsService.deleteOneCard(cardCreated.id, user.id);
@@ -92,12 +102,15 @@ describe('CardService', () => {
     });
 
     it('should list all revision cards for today', async () => {
+      if (!user) throw new BadRequestException('User not found');
+      if (!cardType) throw new BadRequestException('CardType not found');
+
       const generateData = (date: number) => ({
         question: 'test',
         answer: 'test',
         reference: 'HA_test1',
         card_type: { connect: { id: 1 } },
-        user: { connect: { id: user.id } },
+        user: { connect: { id: user!.id } },
         tags: {
           connect: [{ id: 1 }],
         },

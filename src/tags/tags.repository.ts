@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../db/prisma.service';
-import { Prisma } from '@prisma/client';
+import { CreateTagDto } from './dto/create-tag.dto';
+import { UpdateTagDto } from './dto/update-tag.dto';
 
 @Injectable()
 export class TagsRepository {
   constructor(private readonly prismaService: PrismaService) {}
 
-  findAll(userId: number) {
+  findAllTags(userId: number) {
     return this.prismaService.tag.findMany({
       where: {
         user_id: userId,
@@ -14,7 +15,7 @@ export class TagsRepository {
     });
   }
 
-  findMany(ids: number[], userId: number) {
+  findManyTags(ids: number[], userId: number) {
     return this.prismaService.tag.findMany({
       where: {
         id: {
@@ -31,9 +32,12 @@ export class TagsRepository {
     });
   }
 
-  findOne(tagWhereUniqueInput: Prisma.TagWhereUniqueInput) {
+  findOneTag(id: number, userId: number) {
     return this.prismaService.tag.findUnique({
-      where: tagWhereUniqueInput,
+      where: {
+        id,
+        user_id: userId,
+      },
       select: {
         id: true,
         name: true,
@@ -43,9 +47,21 @@ export class TagsRepository {
     });
   }
 
-  create(tag: Prisma.TagCreateInput) {
+  createTag(
+    tag: Omit<CreateTagDto, 'colorId'>,
+    userId: number,
+    colorId: number,
+  ) {
     return this.prismaService.tag.create({
-      data: tag,
+      data: {
+        ...tag,
+        user: {
+          connect: {
+            id: userId,
+          },
+        },
+        color: { connect: { id: colorId } },
+      },
       select: {
         id: true,
         name: true,
@@ -55,13 +71,25 @@ export class TagsRepository {
     });
   }
 
-  update(
-    tagWhereUniqueInput: Prisma.TagWhereUniqueInput,
-    tag: Prisma.TagUpdateInput,
+  updateOneTag(
+    id: number,
+    tag: UpdateTagDto,
+    userId: number,
+    colorId?: number,
   ) {
     return this.prismaService.tag.update({
-      where: tagWhereUniqueInput,
-      data: tag,
+      where: {
+        id,
+      },
+      data: {
+        ...tag,
+        user: {
+          connect: {
+            id: userId,
+          },
+        },
+        color: colorId ? { connect: { id: colorId } } : undefined,
+      },
       select: {
         id: true,
         name: true,
@@ -71,9 +99,9 @@ export class TagsRepository {
     });
   }
 
-  delete(tagWhereUniqueInput: Prisma.TagWhereUniqueInput) {
+  deleteOneTag(id: number) {
     return this.prismaService.tag.delete({
-      where: tagWhereUniqueInput,
+      where: { id },
       select: {
         id: true,
         name: true,

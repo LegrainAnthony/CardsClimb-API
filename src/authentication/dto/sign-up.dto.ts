@@ -8,16 +8,16 @@ import {
 export class SignUpDto {
   @IsString()
   @IsNotEmpty()
-  username: string;
+  username!: string;
 
   @IsEmail()
   @IsNotEmpty()
-  email: string;
+  email!: string;
 
   @IsString()
   @IsNotEmpty()
   // @IsStrongPassword({
   //   minLength: 12,
   // })
-  password: string;
+  password!: string;
 }

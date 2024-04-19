@@ -23,20 +23,22 @@ describe('TagService', () => {
 
     const user = await prisma.user.findUnique({ where: { id: 1 } });
 
-    userId = user.id;
+    userId = user!.id;
 
     const color = await prisma.color.create({
       data: { name: 'Violet', hex: '#A78BFA' },
     });
     colorId = color.id;
+
     testTags = {
       name: 'test',
+      colorId,
     };
   });
 
   it('/tags (POST)', async () => {
-    const tag = await service.create(userId, colorId, testTags);
-    tagCreated = { ...tag, color_id: tag.color.id, user_id: null };
+    const tag = await service.create(userId, testTags);
+    tagCreated = { ...tag, color_id: tag.color.id, user_id: 0 };
 
     expect(tagCreated.name).toBe(testTags.name);
     expect(tagCreated.color_id).toBe(colorId);
@@ -60,7 +62,7 @@ describe('TagService', () => {
   });
 
   it('/tags/1 (PATCH)', async () => {
-    const tag = await service.update(tagCreated.id, userId, null, {
+    const tag = await service.update(tagCreated.id, userId, {
       name: 'test2',
     });
 

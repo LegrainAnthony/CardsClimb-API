@@ -17,7 +17,7 @@ describe('CardService', () => {
     prisma = moduleRef.get<PrismaService>(PrismaService);
     cardTypesService = moduleRef.get<CardTypesService>(CardTypesService);
 
-    cardType = await prisma.cardType.findUnique({ where: { id: 1 } });
+    cardType = (await prisma.cardType.findUnique({ where: { id: 1 } }))!;
   });
 
   describe('create', () => {

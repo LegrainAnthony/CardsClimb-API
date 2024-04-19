@@ -9,21 +9,21 @@ import {
 export class CreateCardDto {
   @IsString()
   @IsNotEmpty()
-  reference: string;
+  reference!: string;
 
   @IsString()
   @IsNotEmpty()
-  question: string;
+  question!: string;
 
   @IsString()
   @IsOptional()
-  answer: string;
+  answer!: string;
 
   @IsArray()
   @IsNumber({}, { each: true })
-  tagIds: number[];
+  tagIds!: number[];
 
   @IsNumber()
   @IsNotEmpty()
-  cardTypeId: number;
+  cardTypeId!: number;
 }

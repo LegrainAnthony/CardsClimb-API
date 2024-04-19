@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Box, Prisma } from '@prisma/client';
 import { PrismaService } from 'src/db/prisma.service';
 
@@ -47,6 +47,10 @@ export class BoxesRepository {
         box_steps: true,
       },
     });
+
+    if (!boxWithSteps) {
+      throw new NotFoundException('Box with step not found');
+    }
 
     return boxWithSteps;
   }

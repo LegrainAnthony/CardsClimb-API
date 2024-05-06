@@ -13,6 +13,24 @@ export class UsersRepository {
     });
   }
 
+  insertRefreshToken(token: string, userId: number) {
+    return this.prismaService.user.update({
+      where: { id: userId },
+      data: {
+        refresh_token: token,
+      },
+    });
+  }
+
+  deleteRefreshToken(userId: number) {
+    return this.prismaService.user.update({
+      where: { id: userId },
+      data: {
+        refresh_token: null,
+      },
+    });
+  }
+
   findOneByEmail(email: string) {
     return this.findOne({ email });
   }

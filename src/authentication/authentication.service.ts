@@ -11,7 +11,6 @@ import { UsersRepository } from 'src/users/users.repository';
 import appConfig from 'src/config/app.config';
 import { ConfigType } from '@nestjs/config';
 import { User } from '@prisma/client';
-import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { randomUUID } from 'crypto';
 import { RefreshTokenIdsStorageService } from 'src/redis/refresh-token-ids-storage.service';
 
@@ -92,30 +91,36 @@ export class AuthenticationService {
       refreshTokenId,
       this.jwtConfiguration.refreshTokenTtl,
     );
+
+    await this.userRepository.insertRefreshToken(refreshToken, user.id);
+
     return {
       accessToken,
-      refreshToken,
     };
   }
 
-  async refreshTokens(refreshTokenDto: RefreshTokenDto, userId: number) {
+  async refreshTokens(userId: number) {
     try {
+      const user = await this.userRepository.findOneById(userId);
+
+      if (!user) throw new NotFoundException('User not found');
+
+      if (!user.refresh_token) {
+        throw new UnauthorizedException();
+      }
+
       const { sub, refreshTokenId } = await this.jwtService.verifyAsync<{
         sub: number;
         refreshTokenId: string;
-      }>(refreshTokenDto.refreshToken, {
+      }>(user.refresh_token, {
         secret: this.jwtConfiguration.secret,
         audience: this.jwtConfiguration.audience,
         issuer: this.jwtConfiguration.issuer,
       });
 
-      if (userId !== sub) {
+      if (user.id !== sub) {
         throw new UnauthorizedException();
       }
-
-      const user = await this.userRepository.findOneById(sub);
-
-      if (!user) throw new NotFoundException('User not found');
 
       // Vérfier si l'id du refresh token est valide, si ce n'est pas le cas
       // il est fort possible que le payload du token ait été modifié

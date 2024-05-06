@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/db/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class UsersRepository {
@@ -13,18 +14,27 @@ export class UsersRepository {
   }
 
   findOneByEmail(email: string) {
-    return this.prismaService.user.findFirst({
-      where: {
-        email,
-      },
-    });
+    return this.findOne({ email });
   }
 
   findOneById(id: number) {
-    return this.prismaService.user.findFirst({
-      where: {
-        id,
-      },
+    return this.findOne({ id });
+  }
+
+  findOne(where: Prisma.UserWhereInput, select?: Prisma.UserSelect) {
+    {
+      return this.prismaService.user.findFirst({
+        where,
+        select,
+      });
+    }
+  }
+
+  findOneWithoutPassword(userWhereUniqueInput: Prisma.UserWhereInput) {
+    return this.findOne(userWhereUniqueInput, {
+      id: true,
+      email: true,
+      username: true,
     });
   }
 }

@@ -43,11 +43,7 @@ export class AuthenticationService {
       hashed_password: hashedPassword,
     });
 
-    const payload = { username: userCreated.username, sub: userCreated.id };
-
-    return {
-      accessToken: await this.jwtService.signAsync(payload),
-    };
+    return this.generateTokens(userCreated);
   }
 
   async signIn(user: signIn) {
@@ -69,6 +65,18 @@ export class AuthenticationService {
     }
 
     return this.generateTokens(userFound);
+  }
+
+  async me(userId: number) {
+    const user = await this.userRepository.findOneWithoutPassword({
+      id: userId,
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return user;
   }
 
   async generateTokens(user: User) {
@@ -142,15 +150,14 @@ export class AuthenticationService {
   }
 
   async getCurrentUser(userId: number) {
-    const user = await this.userRepository.findOneById(userId);
+    const user = await this.userRepository.findOneWithoutPassword({
+      id: userId,
+    });
 
     if (!user) {
       throw new NotFoundException('User not found');
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { hashed_password, ...userWithoutPassword } = user;
-
-    return userWithoutPassword;
+    return user;
   }
 }

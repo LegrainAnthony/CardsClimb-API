@@ -29,9 +29,7 @@ export class AuthenticationService {
   ) {}
 
   async signUp(user: SignUp) {
-    const isUserExist = await this.userRepository.findOne({
-      email: user.email,
-    });
+    const isUserExist = await this.userRepository.findOneByEmail(user.email);
 
     if (isUserExist) {
       throw new UnauthorizedException('User already exists');
@@ -49,7 +47,7 @@ export class AuthenticationService {
   }
 
   async signIn(user: signIn) {
-    const userFound = await this.userRepository.findOne({ email: user.email });
+    const userFound = await this.userRepository.findOneByEmail(user.email);
 
     if (!userFound) {
       throw new NotFoundException('User not found');
@@ -61,7 +59,9 @@ export class AuthenticationService {
     );
 
     if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid Password');
+      throw new UnauthorizedException({
+        message: 'Invalid password',
+      });
     }
 
     return this.generateTokens(userFound);
@@ -113,9 +113,7 @@ export class AuthenticationService {
         throw new UnauthorizedException();
       }
 
-      const user = await this.userRepository.findOne({
-        id: sub,
-      });
+      const user = await this.userRepository.findOneById(sub);
 
       if (!user) throw new NotFoundException('User not found');
 
@@ -149,5 +147,17 @@ export class AuthenticationService {
         expiresIn,
       },
     );
+  }
+
+  async getCurrentUser(userId: number) {
+    const user = await this.userRepository.findOneWithoutPassword({
+      id: userId,
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return user;
   }
 }

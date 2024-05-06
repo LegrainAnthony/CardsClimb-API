@@ -10,6 +10,8 @@ import { CreateCardDto } from './dto/create-card.dto';
 import { UpdateCardDto } from './dto/update-card.dto';
 import { BoxesService } from 'src/boxes/boxes.service';
 import { BoxStep, Prisma } from '@prisma/client';
+import { StoreInBoxDto } from './dto/store-in-box.dto';
+import { ValidateCard } from './interfaces/validate-card.interface';
 
 @Injectable()
 export class CardsService {
@@ -88,24 +90,25 @@ export class CardsService {
     return BoxSteps.find((box) => box.id === currentStepBoxId);
   }
 
-  private passedCard(boxId: number, futureBoxStep: BoxStep) {
+  private passedCard(
+    boxId: number,
+    futureBoxStep: BoxStep | undefined,
+  ): ValidateCard {
     return {
-      box: futureBoxStep ? { connect: { id: boxId } } : { disconnect: true },
+      boxId: futureBoxStep ? boxId : null,
       last_revision: this.calculateLastRevision(),
-      boxStep: futureBoxStep
-        ? { connect: { id: futureBoxStep.id } }
-        : { disconnect: true },
+      boxStepId: futureBoxStep ? futureBoxStep.id : null,
       future_revision: futureBoxStep
         ? this.calculateFutureRevision(futureBoxStep.interval)
         : null,
     };
   }
 
-  private failledCard(boxId: number, futureBoxStep: BoxStep) {
+  private failledCard(boxId: number, futureBoxStep: BoxStep): ValidateCard {
     return {
-      box: { connect: { id: boxId } },
+      boxId,
       last_revision: this.calculateLastRevision(),
-      boxStep: { connect: { id: futureBoxStep.id } },
+      boxStepId: futureBoxStep.id,
       future_revision: this.calculateFutureRevision(futureBoxStep.interval),
     };
   }
@@ -117,7 +120,7 @@ export class CardsService {
   ) {
     const card = await this.findOneCard(cardId, userId);
 
-    if (!card.box_id) throw new BadRequestException();
+    if (!card.box_id) throw new BadRequestException('card not in a box');
 
     const box = await this.boxesService.getBoxWithBoxSteps(card.box_id, userId);
     const currentBoxStep = this.getCurrentBoxStep(
@@ -133,10 +136,7 @@ export class CardsService {
       box.box_steps,
     );
 
-    if (!futureBoxStep)
-      throw new NotFoundException('future box step not found');
-
-    let updatedData: Prisma.CardUpdateInput;
+    let updatedData: ValidateCard;
 
     switch (status) {
       case 'failled': {
@@ -151,19 +151,22 @@ export class CardsService {
         throw new Error("Une erreur c'est produite");
     }
 
-    return this.cardsRepository.updateOne(card, updatedData);
+    return this.cardsRepository.validate(card.id, updatedData);
   }
 
   async StoreCardInBox(
     cardId: number,
-    boxId: number,
-    boxStepId: number,
+    storeInBoxData: StoreInBoxDto,
     userId: number,
   ) {
     const card = await this.findOneCard(cardId, userId);
-    const box = await this.boxesService.getBoxWithBoxSteps(boxId, userId);
+    const box = await this.boxesService.getBoxWithBoxSteps(
+      storeInBoxData.boxId,
+      userId,
+    );
     const currentBoxStep =
-      this.getCurrentBoxStep(boxStepId, box.box_steps) || box.box_steps[0];
+      this.getCurrentBoxStep(storeInBoxData.boxStepId, box.box_steps) ||
+      box.box_steps[0];
 
     const updatedData: Prisma.CardUpdateInput = {
       box: { connect: { id: box.id } },
@@ -177,25 +180,12 @@ export class CardsService {
   listCardRevisions(userId: number) {
     const addOneDay = 1;
     const subtractOneDay = 1;
-    return this.cardsRepository.findMany({
-      AND: [
-        {
-          user_id: userId,
-        },
-        {
-          future_revision: {
-            lte: Number(
-              moment().add(addOneDay, 'day').startOf('day').format('x'),
-            ),
-            gte: Number(
-              moment()
-                .subtract(subtractOneDay, 'days')
-                .startOf('day')
-                .format('x'),
-            ),
-          },
-        },
-      ],
-    });
+    return this.cardsRepository.findManyRevisionBetweenTwoDate(
+      userId,
+      Number(moment().add(addOneDay, 'day').startOf('day').format('x')),
+      Number(
+        moment().subtract(subtractOneDay, 'days').startOf('day').format('x'),
+      ),
+    );
   }
 }

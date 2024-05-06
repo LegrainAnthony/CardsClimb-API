@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/db/prisma.service';
+import { ValidateCard } from './interfaces/validate-card.interface';
 
 @Injectable()
 export class CardsRepository {
@@ -54,5 +55,19 @@ export class CardsRepository {
         },
       ],
     });
+  }
+
+  validate(id: number, card: ValidateCard) {
+    const { boxId, boxStepId, ...rest } = card;
+    return this.updateOne(
+      { id },
+      {
+        ...rest,
+        box: boxId ? { connect: { id: boxId } } : { disconnect: true },
+        boxStep: boxStepId
+          ? { connect: { id: boxStepId } }
+          : { disconnect: true },
+      },
+    );
   }
 }

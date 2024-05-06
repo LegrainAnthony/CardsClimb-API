@@ -92,14 +92,17 @@ export class AuthenticationService {
       this.jwtConfiguration.refreshTokenTtl,
     );
 
-    await this.userRepository.insertRefreshToken(refreshToken, user.id);
+    const hashedRefreshToken = await hash(refreshToken, SALT);
+
+    await this.userRepository.insertRefreshToken(hashedRefreshToken, user.id);
 
     return {
       accessToken,
+      refreshToken,
     };
   }
 
-  async refreshTokens(userId: number) {
+  async refreshTokens(refreshToken: string, userId: number) {
     try {
       const user = await this.userRepository.findOneById(userId);
 
@@ -109,10 +112,19 @@ export class AuthenticationService {
         throw new UnauthorizedException();
       }
 
+      const isRefreshTokenValid = await compare(
+        refreshToken,
+        user.refresh_token,
+      );
+
+      if (!isRefreshTokenValid) {
+        throw new UnauthorizedException();
+      }
+
       const { sub, refreshTokenId } = await this.jwtService.verifyAsync<{
         sub: number;
         refreshTokenId: string;
-      }>(user.refresh_token, {
+      }>(refreshToken, {
         secret: this.jwtConfiguration.secret,
         audience: this.jwtConfiguration.audience,
         issuer: this.jwtConfiguration.issuer,

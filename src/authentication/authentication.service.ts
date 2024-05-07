@@ -14,7 +14,7 @@ import { User } from '@prisma/client';
 import { randomUUID } from 'crypto';
 import { RefreshTokenIdsStorageService } from 'src/redis/refresh-token-ids-storage.service';
 
-const SALT = 10;
+const SALT_ROUNDS = 10;
 
 @Injectable()
 export class AuthenticationService {
@@ -34,7 +34,7 @@ export class AuthenticationService {
       throw new UnauthorizedException('User already exists');
     }
 
-    const hashedPassword = await hash(user.password, SALT);
+    const hashedPassword = await hash(user.password, SALT_ROUNDS);
 
     const userCreated = await this.userRepository.create({
       username: user.username,
@@ -98,7 +98,7 @@ export class AuthenticationService {
       this.jwtConfiguration.refreshTokenTtl,
     );
 
-    const hashedRefreshToken = await hash(refreshToken, SALT);
+    const hashedRefreshToken = await hash(refreshToken, SALT_ROUNDS);
 
     await this.userRepository.insertRefreshToken(hashedRefreshToken, user.id);
 
@@ -147,7 +147,7 @@ export class AuthenticationService {
         refreshTokenId,
       );
       if (isValid) {
-        await this.refreshTokenIdsStorage.invalidate(user.id);
+        await this.refreshTokenIdsStorage.invalidate(user.id, refreshTokenId);
       } else {
         throw new Error('Refresh token is invalid');
       }

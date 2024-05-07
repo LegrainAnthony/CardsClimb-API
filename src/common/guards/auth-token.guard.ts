@@ -52,16 +52,14 @@ export class AuthTokenGuard implements CanActivate {
       const needRefreshToken = this.getMetadata(REFRESH_TOKEN_KEY, context);
 
       if (needRefreshToken) {
-        decodedToken = await this.jwtService.decode(extracted.token);
+        decodedToken = this.jwtService.decode(extracted.token);
       } else {
         decodedToken = await this.jwtService.verifyAsync(extracted.token, {
           secret: this.jwtConfiguration.secret,
         });
       }
 
-      const { refreshTokenId } = await this.jwtService.decode(
-        extracted.refreshToken,
-      );
+      const { refreshTokenId } = this.jwtService.decode(extracted.refreshToken);
 
       const isRefreshTokenValid = await this.refreshTokenIdsStorage.validate(
         parseInt(decodedToken.sub, 10),

@@ -14,12 +14,14 @@ import { ConfigType } from '@nestjs/config';
 import appConfig from 'src/config/app.config';
 import { REQUEST_USER_KEY } from 'src/authentication/constant/user.constant';
 import { REFRESH_TOKEN_KEY } from '../decorators/refresh-token.decorator';
+import { RefreshTokenIdsStorageService } from 'src/redis/refresh-token-ids-storage.service';
 
 @Injectable()
 export class AuthTokenGuard implements CanActivate {
   constructor(
     private readonly reflector: Reflector,
     private readonly jwtService: JwtService,
+    private readonly refreshTokenIdsStorage: RefreshTokenIdsStorageService,
     @Inject(appConfig.KEY)
     private readonly jwtConfiguration: ConfigType<typeof appConfig>,
   ) {}
@@ -32,23 +34,42 @@ export class AuthTokenGuard implements CanActivate {
 
     const request = context.switchToHttp().getRequest() as Request;
 
-    const extractedToken = this.extractTokenFromRequest(request);
+    const extracted = this.extractTokensFromRequest(request);
 
-    if (!extractedToken) {
+    if (!extracted?.token) {
       throw new UnauthorizedException();
     }
 
     try {
-      let decodedToken;
+      let decodedToken: {
+        sub: string;
+        iat: number;
+        exp: number;
+        aud: string;
+        iss: string;
+      };
 
-      const isRefreshToken = this.getMetadata(REFRESH_TOKEN_KEY, context);
+      const needRefreshToken = this.getMetadata(REFRESH_TOKEN_KEY, context);
 
-      if (isRefreshToken) {
-        decodedToken = await this.jwtService.decode(extractedToken);
+      if (needRefreshToken) {
+        decodedToken = await this.jwtService.decode(extracted.token);
       } else {
-        decodedToken = await this.jwtService.verifyAsync(extractedToken, {
+        decodedToken = await this.jwtService.verifyAsync(extracted.token, {
           secret: this.jwtConfiguration.secret,
         });
+      }
+
+      const { refreshTokenId } = await this.jwtService.decode(
+        extracted.refreshToken,
+      );
+
+      const isRefreshTokenValid = await this.refreshTokenIdsStorage.validate(
+        parseInt(decodedToken.sub, 10),
+        refreshTokenId,
+      );
+
+      if (!isRefreshTokenValid) {
+        throw new UnauthorizedException('Invalid refresh token');
       }
 
       request[REQUEST_USER_KEY] = decodedToken;
@@ -59,20 +80,31 @@ export class AuthTokenGuard implements CanActivate {
     }
   }
 
-  extractTokenFromRequest(request: Request) {
-    const authHeader = request.headers.authorization;
+  extractTokensFromRequest(request: Request) {
+    const tokenInHeader = request.headers.authorization;
+    const refreshTokenHeader = request.headers.refreshtoken as string;
 
-    if (!authHeader) {
+    if (!tokenInHeader) {
       throw new BadRequestException('Authorization header is missing');
     }
 
-    const [bearer, token] = authHeader.split(' ');
+    if (!refreshTokenHeader) {
+      throw new BadRequestException('RefreshToken header is missing');
+    }
+
+    const [bearer, token] = tokenInHeader.split(' ');
+
+    const [bearerRefresh, refreshToken] = refreshTokenHeader.split(' ');
 
     if (bearer !== 'Bearer' || !token) {
       return null;
     }
 
-    return token;
+    if (bearerRefresh !== 'Bearer' || !refreshToken) {
+      return null;
+    }
+
+    return { token, refreshToken };
   }
 
   getMetadata(key: string, context: ExecutionContext) {

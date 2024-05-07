@@ -71,6 +71,7 @@ export class AuthTokenGuard implements CanActivate {
       }
 
       request[REQUEST_USER_KEY] = decodedToken;
+      request[REFRESH_TOKEN_KEY] = extracted.refreshToken;
 
       return true;
     } catch {

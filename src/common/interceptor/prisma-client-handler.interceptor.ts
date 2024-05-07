@@ -17,8 +17,13 @@ export class prismaClientHandler implements NestInterceptor {
     return next.handle().pipe(
       catchError((err): Observable<unknown> => {
         if (err instanceof Prisma.PrismaClientKnownRequestError) {
-          return throwError(() => new BadRequestException());
+          throw new BadRequestException('Invalid data provided');
         }
+
+        if (err instanceof Prisma.PrismaClientValidationError) {
+          throw new BadRequestException('Invalid data provided');
+        }
+
         return throwError(() => err);
       }),
     );

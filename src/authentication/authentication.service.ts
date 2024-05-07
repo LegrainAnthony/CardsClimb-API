@@ -11,7 +11,6 @@ import { UsersRepository } from 'src/users/users.repository';
 import appConfig from 'src/config/app.config';
 import { ConfigType } from '@nestjs/config';
 import { User } from '@prisma/client';
-import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { randomUUID } from 'crypto';
 import { RefreshTokenIdsStorageService } from 'src/redis/refresh-token-ids-storage.service';
 
@@ -29,9 +28,7 @@ export class AuthenticationService {
   ) {}
 
   async signUp(user: SignUp) {
-    const isUserExist = await this.userRepository.findOne({
-      email: user.email,
-    });
+    const isUserExist = await this.userRepository.findOneByEmail(user.email);
 
     if (isUserExist) {
       throw new UnauthorizedException('User already exists');
@@ -45,15 +42,11 @@ export class AuthenticationService {
       hashed_password: hashedPassword,
     });
 
-    const payload = { username: userCreated.username, sub: userCreated.id };
-
-    return {
-      accessToken: await this.jwtService.signAsync(payload),
-    };
+    return this.generateTokens(userCreated);
   }
 
   async signIn(user: signIn) {
-    const userFound = await this.userRepository.findOne({ email: user.email });
+    const userFound = await this.userRepository.findOneByEmail(user.email);
 
     if (!userFound) {
       throw new NotFoundException('User not found');
@@ -65,10 +58,30 @@ export class AuthenticationService {
     );
 
     if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid Password');
+      throw new UnauthorizedException({
+        message: 'Invalid password',
+      });
     }
 
     return this.generateTokens(userFound);
+  }
+
+  async signOut(userId: number) {
+    await this.refreshTokenIdsStorage.invalidate(userId);
+    await this.userRepository.deleteRefreshToken(userId);
+    return { message: 'User signed out' };
+  }
+
+  async me(userId: number) {
+    const user = await this.userRepository.findOneWithoutPassword({
+      id: userId,
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return user;
   }
 
   async generateTokens(user: User) {
@@ -84,32 +97,48 @@ export class AuthenticationService {
       refreshTokenId,
       this.jwtConfiguration.refreshTokenTtl,
     );
+
+    const hashedRefreshToken = await hash(refreshToken, SALT);
+
+    await this.userRepository.insertRefreshToken(hashedRefreshToken, user.id);
+
     return {
       accessToken,
       refreshToken,
     };
   }
 
-  async refreshTokens(refreshTokenDto: RefreshTokenDto, userId: number) {
+  async refreshTokens(refreshToken: string, userId: number) {
     try {
+      const user = await this.userRepository.findOneById(userId);
+
+      if (!user) throw new NotFoundException('User not found');
+
+      if (!user.refresh_token) {
+        throw new UnauthorizedException();
+      }
+
+      const isRefreshTokenValid = await compare(
+        refreshToken,
+        user.refresh_token,
+      );
+
+      if (!isRefreshTokenValid) {
+        throw new UnauthorizedException();
+      }
+
       const { sub, refreshTokenId } = await this.jwtService.verifyAsync<{
         sub: number;
         refreshTokenId: string;
-      }>(refreshTokenDto.refreshToken, {
+      }>(refreshToken, {
         secret: this.jwtConfiguration.secret,
         audience: this.jwtConfiguration.audience,
         issuer: this.jwtConfiguration.issuer,
       });
 
-      if (userId !== sub) {
+      if (user.id !== sub) {
         throw new UnauthorizedException();
       }
-
-      const user = await this.userRepository.findOne({
-        id: sub,
-      });
-
-      if (!user) throw new NotFoundException('User not found');
 
       // Vérfier si l'id du refresh token est valide, si ce n'est pas le cas
       // il est fort possible que le payload du token ait été modifié
@@ -141,5 +170,17 @@ export class AuthenticationService {
         expiresIn,
       },
     );
+  }
+
+  async getCurrentUser(userId: number) {
+    const user = await this.userRepository.findOneWithoutPassword({
+      id: userId,
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return user;
   }
 }

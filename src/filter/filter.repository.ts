@@ -2,7 +2,17 @@ import { Injectable } from '@nestjs/common';
 import { Prisma, PrismaClient } from '@prisma/client';
 import { PrismaService } from 'src/db/prisma.service';
 
-type WhereInputTypes = {
+export enum ModelNames {
+  User = 'User',
+  Card = 'Card',
+  Box = 'Box',
+  BoxStep = 'BoxStep',
+  Tag = 'Tag',
+  CardType = 'CardType',
+  Color = 'Color',
+}
+
+export type WhereInputTypes = {
   User: Prisma.UserWhereInput;
   Card: Prisma.CardWhereInput;
   Box: Prisma.BoxWhereInput;
@@ -12,7 +22,7 @@ type WhereInputTypes = {
   Color: Prisma.ColorWhereInput;
 };
 
-type IncludeInputTypes = {
+export type IncludeInputTypes = {
   User: Prisma.UserInclude;
   Card: Prisma.CardInclude;
   Box: Prisma.BoxInclude;
@@ -22,6 +32,9 @@ type IncludeInputTypes = {
   Color: Prisma.ColorInclude;
 };
 
+export type SelectInputType = {
+  id: boolean;
+};
 @Injectable()
 export class FilterRepository {
   constructor(private readonly prismaService: PrismaService) {}
@@ -31,15 +44,17 @@ export class FilterRepository {
     {
       where,
       include,
+      select,
     }: {
       where: WhereInputTypes[Model];
       include?: IncludeInputTypes[Model];
+      select?: SelectInputType;
     },
   ) {
     const modelClient = this.prismaService[
       model as keyof typeof PrismaClient.prototype
     ] as any;
 
-    return modelClient.findMany({ where, include });
+    return modelClient.findMany({ where, include, select });
   }
 }

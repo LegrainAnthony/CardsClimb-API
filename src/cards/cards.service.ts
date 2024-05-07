@@ -1,8 +1,10 @@
 import {
   BadRequestException,
   ForbiddenException,
+  Inject,
   Injectable,
   NotFoundException,
+  forwardRef,
 } from '@nestjs/common';
 import * as moment from 'moment-timezone';
 import { CardsRepository } from './cards.repository';
@@ -17,6 +19,7 @@ export class CardsService {
   constructor(
     private readonly cardsRepository: CardsRepository,
     private readonly boxesService: BoxesService,
+    @Inject(forwardRef(() => FilterService))
     private readonly filterService: FilterService,
   ) {}
 
@@ -62,6 +65,18 @@ export class CardsService {
     return this.cardsRepository.updateOne({ id }, updatedData);
   }
 
+  async findManyCardByIds(ids: number[], userId: number) {
+    const cards = await this.cardsRepository.findMany({
+      id: { in: ids },
+    });
+
+    if (!cards.every((card) => card.user_id === userId)) {
+      throw new ForbiddenException();
+    }
+
+    return cards;
+  }
+
   async deleteOneCard(id: number, userId: number) {
     await this.findOneCard(id, userId);
     return this.cardsRepository.deleteOne({ id });
@@ -72,7 +87,7 @@ export class CardsService {
   }
 
   private calculateFutureRevision(interval: number) {
-    return Number(moment().tz('Asia/Tokyo').add(interval, 'days').format('x'));
+    return Number(moment().add(interval, 'days').format('x'));
   }
 
   private calculateLastRevision() {
@@ -166,7 +181,6 @@ export class CardsService {
     const box = await this.boxesService.getBoxWithBoxSteps(boxId, userId);
     const currentBoxStep =
       this.getCurrentBoxStep(boxStepId, box.box_steps) || box.box_steps[0];
-      await this.filterService.test();
 
     const updatedData: Prisma.CardUpdateInput = {
       box: { connect: { id: box.id } },

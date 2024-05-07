@@ -41,6 +41,9 @@ export class CardsRepository {
   findMany(cardWhereInput: Prisma.CardWhereInput) {
     return this.prismaService.card.findMany({
       where: cardWhereInput,
+      include: {
+        tags: true,
+      },
     });
   }
 }

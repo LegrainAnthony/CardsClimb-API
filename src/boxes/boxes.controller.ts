@@ -49,7 +49,7 @@ export class BoxesController {
     return this.boxesService.findAllBoxes(UserId);
   }
 
-  @Get('/test/:id')
+  @Get('/box-with-steps/:id')
   getBoxWithBoxSteps(
     @Param('id', ParseIntPipe) id: number,
     @ActiveUser() UserId: number,

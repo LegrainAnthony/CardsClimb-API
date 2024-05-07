@@ -5,6 +5,7 @@ import {
   HttpCode,
   HttpStatus,
   Post,
+  Req,
 } from '@nestjs/common';
 import { AuthenticationService } from './authentication.service';
 import { SignUpDto } from './dto/sign-up.dto';
@@ -12,7 +13,11 @@ import { SignInDto } from './dto/sign-in.dto';
 import { Public } from 'src/common/decorators/public.decorator';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { ActiveUser } from 'src/common/decorators/user-id.decorator';
-import { RefreshToken } from 'src/common/decorators/refresh-token.decorator';
+import {
+  REFRESH_TOKEN_KEY,
+  RefreshToken,
+} from 'src/common/decorators/refresh-token.decorator';
+import { Request } from 'express';
 
 @Controller('authentication')
 export class AuthenticationController {
@@ -31,8 +36,9 @@ export class AuthenticationController {
   }
 
   @Post('sign-out')
-  signOut(@ActiveUser() userId: number) {
-    return this.authenticationService.signOut(userId);
+  signOut(@ActiveUser() userId: number, @Req() req: Request) {
+    const refreshToken = req[REFRESH_TOKEN_KEY] as string;
+    return this.authenticationService.signOut(userId, refreshToken);
   }
 
   @RefreshToken()

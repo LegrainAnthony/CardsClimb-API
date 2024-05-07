@@ -14,7 +14,7 @@ import { User } from '@prisma/client';
 import { randomUUID } from 'crypto';
 import { RefreshTokenIdsStorageService } from 'src/redis/refresh-token-ids-storage.service';
 
-const SALT = 10;
+const SALT_ROUNDS = 10;
 
 @Injectable()
 export class AuthenticationService {
@@ -34,7 +34,7 @@ export class AuthenticationService {
       throw new UnauthorizedException('User already exists');
     }
 
-    const hashedPassword = await hash(user.password, SALT);
+    const hashedPassword = await hash(user.password, SALT_ROUNDS);
 
     const userCreated = await this.userRepository.create({
       username: user.username,
@@ -66,9 +66,15 @@ export class AuthenticationService {
     return this.generateTokens(userFound);
   }
 
-  async signOut(userId: number) {
-    await this.refreshTokenIdsStorage.invalidate(userId);
-    await this.userRepository.deleteRefreshToken(userId);
+  async signOut(userId: number, refreshToken?: string) {
+    let refreshTokenId: string | undefined;
+
+    if (refreshToken) {
+      const { refreshTokenId: id } = await this.jwtService.decode(refreshToken);
+      refreshTokenId = id;
+    }
+
+    await this.refreshTokenIdsStorage.invalidate(userId, refreshTokenId);
     return { message: 'User signed out' };
   }
 
@@ -98,10 +104,6 @@ export class AuthenticationService {
       this.jwtConfiguration.refreshTokenTtl,
     );
 
-    const hashedRefreshToken = await hash(refreshToken, SALT);
-
-    await this.userRepository.insertRefreshToken(hashedRefreshToken, user.id);
-
     return {
       accessToken,
       refreshToken,
@@ -113,19 +115,6 @@ export class AuthenticationService {
       const user = await this.userRepository.findOneById(userId);
 
       if (!user) throw new NotFoundException('User not found');
-
-      if (!user.refresh_token) {
-        throw new UnauthorizedException();
-      }
-
-      const isRefreshTokenValid = await compare(
-        refreshToken,
-        user.refresh_token,
-      );
-
-      if (!isRefreshTokenValid) {
-        throw new UnauthorizedException();
-      }
 
       const { sub, refreshTokenId } = await this.jwtService.verifyAsync<{
         sub: number;
@@ -147,7 +136,7 @@ export class AuthenticationService {
         refreshTokenId,
       );
       if (isValid) {
-        await this.refreshTokenIdsStorage.invalidate(user.id);
+        await this.refreshTokenIdsStorage.invalidate(user.id, refreshTokenId);
       } else {
         throw new Error('Refresh token is invalid');
       }

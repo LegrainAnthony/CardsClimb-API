@@ -12,7 +12,6 @@ model User {
     username String
     email String @unique
     hashed_password String
-    refresh_token String?
     boxes Box[]
     cards Card[]
     tags Tag[]

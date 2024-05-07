@@ -66,6 +66,12 @@ export class AuthenticationService {
     return this.generateTokens(userFound);
   }
 
+  async signOut(userId: number) {
+    await this.refreshTokenIdsStorage.invalidate(userId);
+    await this.userRepository.deleteRefreshToken(userId);
+    return { message: 'User signed out' };
+  }
+
   async me(userId: number) {
     const user = await this.userRepository.findOneWithoutPassword({
       id: userId,

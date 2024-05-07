@@ -20,6 +20,10 @@ export class RefreshTokenIdsStorageService {
     await this.cacheManager.del(this.getKey(userId));
   }
 
+  async isTokenInStorage(userId: number): Promise<boolean> {
+    return Boolean(await this.cacheManager.get(this.getKey(userId)));
+  }
+
   private getKey(userId: number): string {
     return `user-${userId}`;
   }

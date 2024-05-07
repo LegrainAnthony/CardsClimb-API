@@ -30,6 +30,11 @@ export class AuthenticationController {
     return this.authenticationService.signIn(user);
   }
 
+  @Post('sign-out')
+  signOut(@ActiveUser() userId: number) {
+    return this.authenticationService.signOut(userId);
+  }
+
   @RefreshToken()
   @HttpCode(HttpStatus.OK)
   @Post('refresh-tokens')

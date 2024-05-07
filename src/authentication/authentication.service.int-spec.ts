@@ -46,9 +46,7 @@ describe('AuthenticationService', () => {
       const { sub } = jwtService.decode(user.accessToken) as { sub: number };
 
       const refreshedTokens = await authenticationService.refreshTokens(
-        {
-          refreshToken: user.refreshToken,
-        },
+        user.refreshToken,
         sub,
       );
 
@@ -65,12 +63,7 @@ describe('AuthenticationService', () => {
       const { sub } = jwtService.decode(user.accessToken) as { sub: number };
 
       try {
-        await authenticationService.refreshTokens(
-          {
-            refreshToken: user.refreshToken + 'a',
-          },
-          sub,
-        );
+        await authenticationService.refreshTokens(user.refreshToken + 'a', sub);
       } catch (e) {
         expect(e).toBeInstanceOf(UnauthorizedException);
         if (e instanceof UnauthorizedException) {
@@ -88,20 +81,10 @@ describe('AuthenticationService', () => {
 
       const { sub } = jwtService.decode(user.accessToken) as { sub: number };
 
-      await authenticationService.refreshTokens(
-        {
-          refreshToken: user.refreshToken,
-        },
-        sub,
-      );
+      await authenticationService.refreshTokens(user.refreshToken, sub);
 
       try {
-        await authenticationService.refreshTokens(
-          {
-            refreshToken: user.refreshToken,
-          },
-          sub,
-        );
+        await authenticationService.refreshTokens(user.refreshToken, sub);
       } catch (e) {
         expect(e).toBeInstanceOf(UnauthorizedException);
         if (e instanceof UnauthorizedException) {

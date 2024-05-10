@@ -1,6 +1,6 @@
 import { BadRequestException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import { Box, BoxStep, User } from '@prisma/client';
+import { Box, BoxStep } from '@prisma/client';
 import { AppModule } from 'src/app.module';
 import { BoxStepsService } from 'src/box-steps/box-steps.service';
 import { CreateBoxStepsDto } from 'src/box-steps/dto/create-box-steps.dto';
@@ -11,8 +11,8 @@ import { BoxesService } from 'src/boxes/boxes.service';
 describe('BoxStepsService', () => {
   let prisma: PrismaService;
   let boxStepsService: BoxStepsService;
-  let boxService: BoxesService
-  let user
+  let boxService: BoxesService;
+  let user;
   let box: Box;
 
   beforeAll(async () => {
@@ -23,7 +23,7 @@ describe('BoxStepsService', () => {
     prisma = moduleRef.get<PrismaService>(PrismaService);
     boxStepsService = moduleRef.get<BoxStepsService>(BoxStepsService);
     boxService = moduleRef.get<BoxesService>(BoxesService);
-     user = await prisma.user.findUnique({ where: { id: 1 } });
+    user = await prisma.user.findUnique({ where: { id: 1 } });
 
     box = await boxService.findOneBox(1, user ? user.id : 1);
   });

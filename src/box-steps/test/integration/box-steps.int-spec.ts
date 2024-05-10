@@ -11,8 +11,8 @@ import { BoxesService } from 'src/boxes/boxes.service';
 describe('BoxStepsService', () => {
   let prisma: PrismaService;
   let boxStepsService: BoxStepsService;
-  let boxService: BoxesService;
-  let user: User;
+  let boxService: BoxesService
+  let user
   let box: Box;
 
   beforeAll(async () => {
@@ -23,14 +23,9 @@ describe('BoxStepsService', () => {
     prisma = moduleRef.get<PrismaService>(PrismaService);
     boxStepsService = moduleRef.get<BoxStepsService>(BoxStepsService);
     boxService = moduleRef.get<BoxesService>(BoxesService);
+     user = await prisma.user.findUnique({ where: { id: 1 } });
 
-    user = await prisma.user.findUnique({
-      where: {
-        id: 1,
-      },
-    });
-
-    box = await boxService.findOneBox(1, user.id);
+    box = await boxService.findOneBox(1, user ? user.id : 1);
   });
 
   describe('createBoxStep', () => {

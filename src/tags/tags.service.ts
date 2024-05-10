@@ -29,13 +29,8 @@ export class TagsService {
   }
 
   async update(id: number, userId: number, tag: UpdateTagDto) {
-    const findTag = await this.findOne(id, userId);
-    return this.tagRepository.updateOneTag(
-      id,
-      tag,
-      userId,
-      tag.colorId || findTag.color.id,
-    );
+    await this.findOne(id, userId);
+    return this.tagRepository.updateOneTag(id, tag, userId);
   }
 
   async delete(id: number, userId: number) {

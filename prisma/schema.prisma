@@ -15,6 +15,8 @@ model User {
     boxes Box[]
     cards Card[]
     tags Tag[]
+    createdAt    DateTime  @default(now())
+    updatedAt    DateTime  @updatedAt
 }
 
 model Box {
@@ -24,6 +26,8 @@ model Box {
   user_id   Int
   box_steps BoxStep[]
   cards     Card[]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 }
 
 model Card {
@@ -42,6 +46,8 @@ model Card {
   card_type       CardType  @relation(fields: [card_type_id], references: [id])
   card_type_id    Int
   tags            Tag[]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 }
 
 model Tag {
@@ -52,13 +58,16 @@ model Tag {
     cards Card[]
     user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
     user_id Int
-
+    createdAt    DateTime  @default(now())
+    updatedAt    DateTime  @updatedAt
 }
 
 model CardType {
   id    Int    @id @default(autoincrement())
   name  String @unique
   cards Card[]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 }
 
 model BoxStep {
@@ -68,6 +77,8 @@ model BoxStep {
   box      Box    @relation(fields: [box_id], references: [id], onDelete: Cascade)
   box_id   Int
   Card     Card[]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 }
 
 model Color {
@@ -75,4 +86,6 @@ model Color {
   name String
   hex  String
   tags Tag[]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 }

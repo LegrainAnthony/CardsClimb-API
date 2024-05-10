@@ -12,6 +12,9 @@ export class TagsRepository {
       where: {
         user_id: userId,
       },
+      include: {
+        color: true,
+      },
     });
   }
 
@@ -23,11 +26,8 @@ export class TagsRepository {
         },
         user_id: userId,
       },
-      select: {
-        id: true,
-        name: true,
+      include: {
         color: true,
-        user_id: true,
       },
     });
   }
@@ -38,11 +38,8 @@ export class TagsRepository {
         id,
         user_id: userId,
       },
-      select: {
-        id: true,
-        name: true,
+      include: {
         color: true,
-        user_id: true,
       },
     });
   }
@@ -62,27 +59,20 @@ export class TagsRepository {
         },
         color: { connect: { id: colorId } },
       },
-      select: {
-        id: true,
-        name: true,
+      include: {
         color: true,
-        user_id: true,
       },
     });
   }
 
-  updateOneTag(
-    id: number,
-    tag: UpdateTagDto,
-    userId: number,
-    colorId?: number,
-  ) {
+  updateOneTag(id: number, tag: UpdateTagDto, userId: number) {
+    const { colorId, ...rest } = tag;
     return this.prismaService.tag.update({
       where: {
         id,
       },
       data: {
-        ...tag,
+        ...rest,
         user: {
           connect: {
             id: userId,
@@ -90,11 +80,8 @@ export class TagsRepository {
         },
         color: colorId ? { connect: { id: colorId } } : undefined,
       },
-      select: {
-        id: true,
-        name: true,
+      include: {
         color: true,
-        user_id: true,
       },
     });
   }
@@ -102,11 +89,8 @@ export class TagsRepository {
   deleteOneTag(id: number) {
     return this.prismaService.tag.delete({
       where: { id },
-      select: {
-        id: true,
-        name: true,
+      include: {
         color: true,
-        user_id: true,
       },
     });
   }

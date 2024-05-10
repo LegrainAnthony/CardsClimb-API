@@ -2,5 +2,9 @@ import { IsNotEmpty, IsString } from 'class-validator';
 export class CreateBoxDto {
   @IsNotEmpty()
   @IsString()
-  name: string;
+  name!: string;
+
+  @IsNotEmpty()
+  @IsNumber()
+  user!: number;
 }

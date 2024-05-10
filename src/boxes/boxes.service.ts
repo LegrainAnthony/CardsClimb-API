@@ -12,14 +12,11 @@ export class BoxesService {
   constructor(private readonly boxRepository: BoxesRepository) {}
 
   createBox(data: CreateBoxDto, userId: number) {
-    return this.boxRepository.create({
-      ...data,
-      user: { connect: { id: userId } },
-    });
+    return this.boxRepository.create(data, userId);
   }
 
   async findOneBox(id: number, userId: number) {
-    const box = await this.boxRepository.findOne({ id });
+    const box = await this.boxRepository.findOne(id);
 
     if (!box) {
       throw new NotFoundException();
@@ -31,33 +28,27 @@ export class BoxesService {
   }
 
   async updateBox(id: number, userId: number, data: UpdateBoxDto) {
-    try {
-      await this.findOneBox(id, userId);
+    await this.findOneBox(id, userId);
 
-      return this.boxRepository.updateOne({ id }, { name: data.name });
-    } catch (err) {
-      throw err;
-    }
+    return this.boxRepository.updateOne(id, data);
   }
 
   async deleteBox(id: number, userId: number) {
-    try {
-      await this.findOneBox(id, userId);
-      return this.boxRepository.deleteOne({ id });
-    } catch (err) {
-      throw err;
-    }
+    await this.findOneBox(id, userId);
+    return this.boxRepository.deleteOne(id);
   }
 
   async findAllBoxes(userId: number) {
-    return this.boxRepository.findAllBoxes({
-      user_id: userId,
-    });
+    return this.boxRepository.findAllUserBoxes(userId);
   }
 
   // TODO à revoir en optimisant en mettant le get des steps sur boxstep et limité le nombre de fois ou on appel la box
   async getBoxWithBoxSteps(boxId: number, userId: number) {
     const box = await this.findOneBox(boxId, userId);
-    return this.boxRepository.getBoxWithBoxSteps(box.id);
+    const boxWithSteps = await this.boxRepository.getBoxWithBoxSteps(box.id);
+    if (!boxWithSteps) {
+      throw new NotFoundException('Box with step not found');
+    }
+    return boxWithSteps;
   }
 }

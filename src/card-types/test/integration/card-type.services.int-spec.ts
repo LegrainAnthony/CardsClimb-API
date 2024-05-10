@@ -1,7 +1,7 @@
 import { Test } from '@nestjs/testing';
 import { CardType } from '@prisma/client';
 import { AppModule } from 'src/app.module';
-import { CardTypesService } from 'src/card-types/cardType.services';
+import { CardTypesService } from 'src/card-types/card-type.services';
 import { PrismaService } from 'src/db/prisma.service';
 
 describe('CardService', () => {
@@ -17,7 +17,7 @@ describe('CardService', () => {
     prisma = moduleRef.get<PrismaService>(PrismaService);
     cardTypesService = moduleRef.get<CardTypesService>(CardTypesService);
 
-    cardType = await prisma.cardType.findUnique({ where: { id: 1 } });
+    cardType = (await prisma.cardType.findUnique({ where: { id: 1 } }))!;
   });
 
   describe('create', () => {

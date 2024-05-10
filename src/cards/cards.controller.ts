@@ -8,7 +8,6 @@ import {
   ParseIntPipe,
   Patch,
   Post,
-  Query,
   Res,
   UseInterceptors,
 } from '@nestjs/common';
@@ -20,6 +19,8 @@ import { Response } from 'express';
 import { UpdateCardDto } from './dto/update-card.dto';
 import { StoreInBoxParamDto } from './dto/param.dto';
 import { ParseBigIntInterceptor } from 'src/common/interceptor/parse-bigint.interceptor';
+import { StoreInBoxDto } from './dto/store-in-box.dto';
+import { validateCardDto } from './dto/validate-card.dto';
 
 @Controller('cards')
 @UseInterceptors(prismaClientHandler, ParseBigIntInterceptor)
@@ -32,11 +33,7 @@ export class CardsController {
   }
 
   @Post()
-  create(
-    @Body() card: CreateCardDto,
-    @Query('cardTypeId', ParseIntPipe) cardTypeId: number,
-    @ActiveUser() userId: number,
-  ) {
+  create(@Body() card: CreateCardDto, @ActiveUser() userId: number) {
     return this.cardsService.createCard(card, userId);
   }
 
@@ -68,21 +65,22 @@ export class CardsController {
     return this.cardsService.findAllFromUser(userId);
   }
 
-  @Get('/validate/:id')
+  @Patch('/validate/:id')
   async validateCard(
     @Param('id', ParseIntPipe) id: number,
     @ActiveUser() userId: number,
-    @Query('status') status: 'failled' | 'passed',
+    @Body() validateCard: validateCardDto,
   ) {
-    return this.cardsService.validateCard(id, userId, status);
+    return this.cardsService.validateCard(id, userId, validateCard.status);
   }
 
-  @Get('store-in-box/:id')
+  @Patch('store-in-box/:id')
   async storeInBox(
-    @Param() { id, boxId, boxStepId }: StoreInBoxParamDto,
+    @Param() { id }: StoreInBoxParamDto,
+    @Body() storeInBoxData: StoreInBoxDto,
     @ActiveUser() userId: number,
   ) {
-    return this.cardsService.StoreCardInBox(id, boxId, boxStepId, userId);
+    return this.cardsService.StoreCardInBox(id, storeInBoxData, userId);
   }
 
   @Get('user/revision')

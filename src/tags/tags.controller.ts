@@ -46,21 +46,17 @@ export class TagsController {
   }
 
   @Post()
-  create(
-    @ActiveUser() userId: number,
-    @Query('colorId', ParseIntPipe) colorId: number,
-    @Body() tag: CreateTagDto,
-  ) {
-    return this.tagService.create(userId, colorId, tag);
+  create(@ActiveUser() userId: number, @Body() tag: CreateTagDto) {
+    return this.tagService.create(userId, tag);
   }
 
-  @Patch(':id/:colorId')
+  @Patch(':id')
   update(
-    @Param() { id, colorId }: ParamsDto,
+    @Param() { id }: ParamsDto,
     @ActiveUser() userId: number,
     @Body() tag: UpdateTagDto,
   ) {
-    return this.tagService.update(id, userId, colorId, tag);
+    return this.tagService.update(id, userId, tag);
   }
 
   @Delete(':id')

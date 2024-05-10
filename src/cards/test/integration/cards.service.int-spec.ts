@@ -12,7 +12,7 @@ describe('CardService', () => {
   let prisma: PrismaService;
   let cardsService: CardsService;
   let cardsRepository: CardsRepository;
-  let user: User | null = null;
+  let user: User | null;
   let cardType: CardType | null = null;
 
   beforeAll(async () => {
@@ -127,6 +127,38 @@ describe('CardService', () => {
       ]);
 
       const cards = await cardsService.listCardRevisions(user.id);
+
+      expect(cards.length).toBe(1);
+    });
+
+    it('should list all late revision cards from 2 days ago', async () => {
+      const generateData = (date: number) => ({
+        question: 'test',
+        answer: 'test',
+        reference: 'HA_test1',
+        card_type: { connect: { id: 1 } },
+        user: { connect: { id: user!.id } },
+        tags: {
+          connect: [{ id: 1 }],
+        },
+        future_revision: date,
+      });
+
+      const addThreeDays = 3;
+      const substractSevenDays = 7;
+
+      await Promise.all([
+        cardsRepository.create(
+          generateData(
+            Number(moment().subtract(substractSevenDays, 'days').format('x')),
+          ),
+        ),
+        cardsRepository.create(
+          generateData(Number(moment().add(addThreeDays, 'days').format('x'))),
+        ),
+      ]);
+
+      const cards = await cardsService.listCardLateRevisions(user!.id);
 
       expect(cards.length).toBe(1);
     });

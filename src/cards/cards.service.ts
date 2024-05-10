@@ -12,8 +12,8 @@ import { CreateCardDto } from './dto/create-card.dto';
 import { UpdateCardDto } from './dto/update-card.dto';
 import { BoxesService } from 'src/boxes/boxes.service';
 import { BoxStep, Prisma } from '@prisma/client';
+import { StoreInBoxParamDto } from './dto/param.dto';
 import { FilterService } from 'src/filter/filter.service';
-import { StoreInBoxDto } from './dto/store-in-box.dto';
 import { ValidateCard } from './interfaces/validate-card.interface';
 import { CardFilterDto } from 'src/filter/dto/cards-filter.dto';
 
@@ -174,17 +174,14 @@ export class CardsService {
 
   async StoreCardInBox(
     cardId: number,
-    storeInBoxData: StoreInBoxDto,
+    datas: StoreInBoxParamDto,
     userId: number,
   ) {
+    const { boxId, boxStepId } = datas;
     const card = await this.findOneCard(cardId, userId);
-    const box = await this.boxesService.getBoxWithBoxSteps(
-      storeInBoxData.boxId,
-      userId,
-    );
+    const box = await this.boxesService.getBoxWithBoxSteps(boxId, userId);
     const currentBoxStep =
-      this.getCurrentBoxStep(storeInBoxData.boxStepId, box.box_steps) ||
-      box.box_steps[0];
+      this.getCurrentBoxStep(boxStepId, box.box_steps) || box.box_steps[0];
 
     const updatedData: Prisma.CardUpdateInput = {
       box: { connect: { id: box.id } },
@@ -219,5 +216,26 @@ export class CardsService {
       randomResult,
       numberOfCard,
     );
+  }
+
+  listCardLateRevisions(userId: number) {
+    const subtractTwoDay = 2;
+    return this.cardsRepository.findMany({
+      AND: [
+        {
+          user_id: userId,
+        },
+        {
+          future_revision: {
+            lte: Number(
+              moment()
+                .subtract(subtractTwoDay, 'days')
+                .startOf('day')
+                .format('x'),
+            ),
+          },
+        },
+      ],
+    });
   }
 }

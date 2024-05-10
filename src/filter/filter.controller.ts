@@ -1,8 +1,4 @@
-import {
-  Controller,
-  Get,
-  UseInterceptors,
-} from '@nestjs/common';
+import { Controller, Get, UseInterceptors } from '@nestjs/common';
 import { FilterService } from './filter.service';
 import { Public } from 'src/common/decorators';
 import { ParseBigIntInterceptor } from 'src/common/interceptor/parse-bigint.interceptor';

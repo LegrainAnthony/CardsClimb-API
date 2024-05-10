@@ -21,7 +21,6 @@ import { Response } from 'express';
 import { UpdateCardDto } from './dto/update-card.dto';
 import { StoreInBoxParamDto } from './dto/param.dto';
 import { ParseBigIntInterceptor } from 'src/common/interceptor/parse-bigint.interceptor';
-import { StoreInBoxDto } from './dto/store-in-box.dto';
 import { validateCardDto } from './dto/validate-card.dto';
 import { CardFilterDto } from 'src/filter/dto/cards-filter.dto';
 
@@ -44,7 +43,6 @@ export class CardsController {
   updateOne(
     @Body() datas: UpdateCardDto,
     @Param('id', ParseIntPipe) id: number,
-
     @ActiveUser() userId: number,
   ) {
     return this.cardsService.updateOneCard(id, userId, datas);
@@ -77,18 +75,23 @@ export class CardsController {
     return this.cardsService.validateCard(id, userId, validateCard.status);
   }
 
-  @Patch('store-in-box/:id')
+  @Post('store-in-box/:id')
   async storeInBox(
-    @Param() { id }: StoreInBoxParamDto,
-    @Body() storeInBoxData: StoreInBoxDto,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() datas: StoreInBoxParamDto,
     @ActiveUser() userId: number,
   ) {
-    return this.cardsService.StoreCardInBox(id, storeInBoxData, userId);
+    return this.cardsService.StoreCardInBox(id, datas, userId);
   }
 
-  @Get('user/revision')
+  @Get('user/revision-of-day')
   listCardRevisions(@ActiveUser() userId: number) {
     return this.cardsService.listCardRevisions(userId);
+  }
+
+  @Get('user/late-revision')
+  listCardLateRevisions(@ActiveUser() userId: number) {
+    return this.cardsService.listCardLateRevisions(userId);
   }
 
   @Get('/games/blitz')

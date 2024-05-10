@@ -1,7 +1,10 @@
 import {
   BadRequestException,
   ForbiddenException,
+  Inject,
   Injectable,
+  NotFoundException,
+  forwardRef,
 } from '@nestjs/common';
 import * as moment from 'moment-timezone';
 import { CardsRepository } from './cards.repository';
@@ -10,12 +13,17 @@ import { UpdateCardDto } from './dto/update-card.dto';
 import { BoxesService } from 'src/boxes/boxes.service';
 import { BoxStep, Prisma } from '@prisma/client';
 import { StoreInBoxParamDto } from './dto/param.dto';
+import { FilterService } from 'src/filter/filter.service';
+import { ValidateCard } from './interfaces/validate-card.interface';
+import { CardFilterDto } from 'src/filter/dto/cards-filter.dto';
 
 @Injectable()
 export class CardsService {
   constructor(
     private readonly cardsRepository: CardsRepository,
     private readonly boxesService: BoxesService,
+    @Inject(forwardRef(() => FilterService))
+    private readonly filterService: FilterService,
   ) {}
 
   createCard(data: CreateCardDto, userId: number) {
@@ -54,10 +62,22 @@ export class CardsService {
       card_type: { connect: { id: cardTypeId } },
       tags: {
         set: [],
-        connect: tagIds.map((tagId) => ({ id: tagId })),
+        connect: tagIds?.map((tagId) => ({ id: tagId })),
       },
     };
     return this.cardsRepository.updateOne({ id }, updatedData);
+  }
+
+  async findManyCardByIds(ids: number[], userId: number) {
+    const cards = await this.cardsRepository.findMany({
+      id: { in: ids },
+    });
+
+    if (!cards.every((card) => card.user_id === userId)) {
+      throw new ForbiddenException();
+    }
+
+    return cards;
   }
 
   async deleteOneCard(id: number, userId: number) {
@@ -70,7 +90,7 @@ export class CardsService {
   }
 
   private calculateFutureRevision(interval: number) {
-    return Number(moment().tz('Asia/Tokyo').add(interval, 'days').format('x'));
+    return Number(moment().add(interval, 'days').format('x'));
   }
 
   private calculateLastRevision() {
@@ -81,28 +101,32 @@ export class CardsService {
     return BoxSteps.find((box) => currentStepBox.order + 1 === box.order);
   }
 
-  private getCurrentBoxStep(currentStepBox: number, BoxSteps: BoxStep[]) {
-    return BoxSteps.find((box) => box.id === currentStepBox);
+  private getCurrentBoxStep(
+    currentStepBoxId: number | null,
+    BoxSteps: BoxStep[],
+  ) {
+    return BoxSteps.find((box) => box.id === currentStepBoxId);
   }
 
-  private passedCard(boxId: number, futureBoxStep: BoxStep) {
+  private passedCard(
+    boxId: number,
+    futureBoxStep: BoxStep | undefined,
+  ): ValidateCard {
     return {
-      box: futureBoxStep ? { connect: { id: boxId } } : { disconnect: true },
+      boxId: futureBoxStep ? boxId : null,
       last_revision: this.calculateLastRevision(),
-      boxStep: futureBoxStep
-        ? { connect: { id: futureBoxStep.id } }
-        : { disconnect: true },
+      boxStepId: futureBoxStep ? futureBoxStep.id : null,
       future_revision: futureBoxStep
         ? this.calculateFutureRevision(futureBoxStep.interval)
         : null,
     };
   }
 
-  private failledCard(boxId: number, futureBoxStep: BoxStep) {
+  private failledCard(boxId: number, futureBoxStep: BoxStep): ValidateCard {
     return {
-      box: { connect: { id: boxId } },
+      boxId,
       last_revision: this.calculateLastRevision(),
-      boxStep: { connect: { id: futureBoxStep.id } },
+      boxStepId: futureBoxStep.id,
       future_revision: this.calculateFutureRevision(futureBoxStep.interval),
     };
   }
@@ -114,19 +138,23 @@ export class CardsService {
   ) {
     const card = await this.findOneCard(cardId, userId);
 
-    if (!card.box_id) throw new BadRequestException();
+    if (!card.box_id) throw new BadRequestException('card not in a box');
 
     const box = await this.boxesService.getBoxWithBoxSteps(card.box_id, userId);
     const currentBoxStep = this.getCurrentBoxStep(
       card.box_step_id,
       box.box_steps,
     );
+
+    if (!currentBoxStep)
+      throw new NotFoundException('current box step not found');
+
     const futureBoxStep = this.calculatePositionStep(
       currentBoxStep,
       box.box_steps,
     );
 
-    let updatedData: Prisma.CardUpdateInput;
+    let updatedData: ValidateCard;
 
     switch (status) {
       case 'failled': {
@@ -141,7 +169,7 @@ export class CardsService {
         throw new Error("Une erreur c'est produite");
     }
 
-    return this.cardsRepository.updateOne(card, updatedData);
+    return this.cardsRepository.validate(card.id, updatedData);
   }
 
   async StoreCardInBox(
@@ -149,7 +177,7 @@ export class CardsService {
     datas: StoreInBoxParamDto,
     userId: number,
   ) {
-    const { boxId, boxStepId } = datas
+    const { boxId, boxStepId } = datas;
     const card = await this.findOneCard(cardId, userId);
     const box = await this.boxesService.getBoxWithBoxSteps(boxId, userId);
     const currentBoxStep =
@@ -167,26 +195,27 @@ export class CardsService {
   listCardRevisions(userId: number) {
     const addOneDay = 1;
     const subtractOneDay = 1;
-    return this.cardsRepository.findMany({
-      AND: [
-        {
-          user_id: userId,
-        },
-        {
-          future_revision: {
-            lte: Number(
-              moment().add(addOneDay, 'day').startOf('day').format('x'),
-            ),
-            gte: Number(
-              moment()
-                .subtract(subtractOneDay, 'days')
-                .startOf('day')
-                .format('x'),
-            ),
-          },
-        },
-      ],
-    });
+    return this.cardsRepository.findManyRevisionBetweenTwoDate(
+      userId,
+      Number(moment().add(addOneDay, 'day').startOf('day').format('x')),
+      Number(
+        moment().subtract(subtractOneDay, 'days').startOf('day').format('x'),
+      ),
+    );
+  }
+
+  blitz(
+    data: CardFilterDto,
+    userId: number,
+    randomResult: boolean,
+    numberOfCard: number,
+  ) {
+    return this.filterService.cardFilter(
+      data,
+      userId,
+      randomResult,
+      numberOfCard,
+    );
   }
 
   listCardLateRevisions(userId: number) {
@@ -206,10 +235,7 @@ export class CardsService {
             ),
           },
         },
-      ]
-    })
+      ],
+    });
   }
-
 }
-
-

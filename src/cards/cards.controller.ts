@@ -5,6 +5,7 @@ import {
   Get,
   HttpStatus,
   Param,
+  ParseBoolPipe,
   ParseIntPipe,
   Patch,
   Post,
@@ -20,6 +21,8 @@ import { Response } from 'express';
 import { UpdateCardDto } from './dto/update-card.dto';
 import { StoreInBoxParamDto } from './dto/param.dto';
 import { ParseBigIntInterceptor } from 'src/common/interceptor/parse-bigint.interceptor';
+import { validateCardDto } from './dto/validate-card.dto';
+import { CardFilterDto } from 'src/filter/dto/cards-filter.dto';
 
 @Controller('cards')
 @UseInterceptors(prismaClientHandler, ParseBigIntInterceptor)
@@ -32,10 +35,7 @@ export class CardsController {
   }
 
   @Post()
-  create(
-    @Body() card: CreateCardDto,
-    @ActiveUser() userId: number,
-  ) {
+  create(@Body() card: CreateCardDto, @ActiveUser() userId: number) {
     return this.cardsService.createCard(card, userId);
   }
 
@@ -62,24 +62,23 @@ export class CardsController {
   }
 
   @Get()
-  AllCardsFromUser(
-    @ActiveUser() userId: number) {
+  AllCardsFromUser(@ActiveUser() userId: number) {
     return this.cardsService.findAllFromUser(userId);
   }
 
-  @Get('/validate/:id')
+  @Patch('/validate/:id')
   async validateCard(
     @Param('id', ParseIntPipe) id: number,
     @ActiveUser() userId: number,
-    @Query('status') status: 'failled' | 'passed',
+    @Body() validateCard: validateCardDto,
   ) {
-    return this.cardsService.validateCard(id, userId, status);
+    return this.cardsService.validateCard(id, userId, validateCard.status);
   }
 
   @Post('store-in-box/:id')
   async storeInBox(
-    @Param('id', ParseIntPipe) id : number,
-    @Body() datas : StoreInBoxParamDto,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() datas: StoreInBoxParamDto,
     @ActiveUser() userId: number,
   ) {
     return this.cardsService.StoreCardInBox(id, datas, userId);
@@ -93,5 +92,15 @@ export class CardsController {
   @Get('user/late-revision')
   listCardLateRevisions(@ActiveUser() userId: number) {
     return this.cardsService.listCardLateRevisions(userId);
+  }
+
+  @Get('/games/blitz')
+  CardFilter(
+    @Body() data: CardFilterDto,
+    @ActiveUser() userId: number,
+    @Query('randomResult', ParseBoolPipe) randomResult: boolean,
+    @Query('numberOfCard', ParseIntPipe) numberOfCard: number,
+  ) {
+    return this.cardsService.blitz(data, userId, randomResult, numberOfCard);
   }
 }

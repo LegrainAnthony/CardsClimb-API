@@ -7,7 +7,7 @@ import { UnauthorizedException } from '@nestjs/common';
 
 const signUpData: SignUpDto = {
   email: 'test@gmail.com',
-  username: 'test',
+  username: 'Test',
   password: 'Password@test1!',
 };
 
@@ -46,9 +46,7 @@ describe('AuthenticationService', () => {
       const { sub } = jwtService.decode(user.accessToken) as { sub: number };
 
       const refreshedTokens = await authenticationService.refreshTokens(
-        {
-          refreshToken: user.refreshToken,
-        },
+        user.refreshToken,
         sub,
       );
 
@@ -65,12 +63,7 @@ describe('AuthenticationService', () => {
       const { sub } = jwtService.decode(user.accessToken) as { sub: number };
 
       try {
-        await authenticationService.refreshTokens(
-          {
-            refreshToken: user.refreshToken + 'a',
-          },
-          sub,
-        );
+        await authenticationService.refreshTokens(user.refreshToken + 'a', sub);
       } catch (e) {
         expect(e).toBeInstanceOf(UnauthorizedException);
         if (e instanceof UnauthorizedException) {
@@ -88,20 +81,10 @@ describe('AuthenticationService', () => {
 
       const { sub } = jwtService.decode(user.accessToken) as { sub: number };
 
-      await authenticationService.refreshTokens(
-        {
-          refreshToken: user.refreshToken,
-        },
-        sub,
-      );
+      await authenticationService.refreshTokens(user.refreshToken, sub);
 
       try {
-        await authenticationService.refreshTokens(
-          {
-            refreshToken: user.refreshToken,
-          },
-          sub,
-        );
+        await authenticationService.refreshTokens(user.refreshToken, sub);
       } catch (e) {
         expect(e).toBeInstanceOf(UnauthorizedException);
         if (e instanceof UnauthorizedException) {
@@ -109,6 +92,20 @@ describe('AuthenticationService', () => {
           expect(e.getStatus()).toBe(unauthorizedStatus);
         }
       }
+    });
+
+    it('should get the current user', async () => {
+      const user = await authenticationService.signIn({
+        email: signUpData.email,
+        password: signUpData.password,
+      });
+
+      const { sub } = jwtService.decode(user.accessToken) as { sub: number };
+
+      const currentUser = await authenticationService.me(sub);
+
+      expect(currentUser.email).toBe(signUpData.email);
+      expect(currentUser.username).toBe(signUpData.username);
     });
   });
 });

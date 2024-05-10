@@ -1,14 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/db/prisma.service';
 
 @Injectable()
 export class CardTypesRepository {
   constructor(private readonly prismaService: PrismaService) {}
 
-  findOne(CardTypeWhereUniqueInput: Prisma.CardTypeWhereUniqueInput) {
+  findOneById(id: number) {
     return this.prismaService.cardType.findUnique({
-      where: CardTypeWhereUniqueInput,
+      where: { id },
     });
   }
 

@@ -5,7 +5,7 @@ import {
   ParseIntPipe,
   UseInterceptors,
 } from '@nestjs/common';
-import { CardTypesService } from './cardType.services';
+import { CardTypesService } from './card-type.services';
 import { prismaClientHandler } from 'src/common/interceptor';
 import { Public } from 'src/common/decorators/public.decorator';
 

@@ -1,53 +1,56 @@
 import { Injectable } from '@nestjs/common';
-import { Box, Prisma } from '@prisma/client';
 import { PrismaService } from 'src/db/prisma.service';
+import { CreateBoxDto } from './dto/create-boxes.dto';
+import { UpdateBoxDto } from './dto/update-boxes.dto';
 
 @Injectable()
 export class BoxesRepository {
   constructor(private readonly prismaService: PrismaService) {}
 
-  create(box: Prisma.BoxCreateInput) {
+  create(box: CreateBoxDto, userId: number) {
     return this.prismaService.box.create({
-      data: box,
+      data: {
+        ...box,
+        user: { connect: { id: userId } },
+      },
     });
   }
 
-  findOne(BoxWhereUniqueInput: Prisma.BoxWhereUniqueInput) {
+  findOne(id: number) {
     return this.prismaService.box.findUnique({
-      where: BoxWhereUniqueInput,
+      where: {
+        id,
+      },
     });
   }
 
-  updateOne(
-    BoxWhereUniqueInput: Prisma.BoxWhereUniqueInput,
-    data: Prisma.BoxUpdateInput,
-  ) {
+  updateOne(id: number, box: UpdateBoxDto) {
     return this.prismaService.box.update({
-      where: BoxWhereUniqueInput,
-      data,
+      where: { id },
+      data: {
+        name: box.name,
+      },
     });
   }
 
-  deleteOne(BoxWhereUniqueInput: Prisma.BoxWhereUniqueInput) {
+  deleteOne(id: number) {
     return this.prismaService.box.delete({
-      where: BoxWhereUniqueInput,
+      where: { id },
     });
   }
 
-  async findAllBoxes(where: Prisma.BoxWhereInput): Promise<Box[]> {
+  async findAllUserBoxes(userId: number) {
     return this.prismaService.box.findMany({
-      where,
+      where: { user_id: userId },
     });
   }
 
   async getBoxWithBoxSteps(id: number) {
-    const boxWithSteps = await this.prismaService.box.findUnique({
+    return this.prismaService.box.findUnique({
       where: { id },
       include: {
         box_steps: true,
       },
     });
-
-    return boxWithSteps;
   }
 }

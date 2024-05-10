@@ -24,8 +24,8 @@ export default registerAs('app', () => ({
   },
   redis: {
     host: process.env.REDIS_HOST,
-    port: parseInt(process.env.REDIS_PORT, 10),
-    db: parseInt(process.env.REDIS_DB, 10),
+    port: parseInt(process.env.REDIS_PORT ?? '6379', 10),
+    db: parseInt(process.env.REDIS_DB ?? '0', 10),
   },
   pgAdminDefaultEmail: process.env.PGADMIN_DEFAULT_EMAIL,
   pgAdminDefaultPassword: process.env.PGADMIN_DEFAULT_PASSWORD,

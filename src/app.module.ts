@@ -12,6 +12,7 @@ import { ColorsModule } from './colors/colors.module';
 import { ConfigModule } from '@nestjs/config';
 import { configClassValidator } from './lib/config-class-validator';
 import { Environment } from './env.validation';
+import { FilterModule } from './filter/filter.module';
 import appConfig from './config/app.config';
 
 @Module({
@@ -33,6 +34,7 @@ import appConfig from './config/app.config';
     UsersModule,
     CommonModule,
     PrismaModule,
+    FilterModule,
   ],
   controllers: [],
   providers: [],

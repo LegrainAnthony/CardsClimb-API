@@ -5,9 +5,11 @@ import {
   Get,
   HttpStatus,
   Param,
+  ParseBoolPipe,
   ParseIntPipe,
   Patch,
   Post,
+  Query,
   Res,
   UseInterceptors,
 } from '@nestjs/common';
@@ -21,6 +23,7 @@ import { StoreInBoxParamDto } from './dto/param.dto';
 import { ParseBigIntInterceptor } from 'src/common/interceptor/parse-bigint.interceptor';
 import { StoreInBoxDto } from './dto/store-in-box.dto';
 import { validateCardDto } from './dto/validate-card.dto';
+import { CardFilterDto } from 'src/filter/dto/cards-filter.dto';
 
 @Controller('cards')
 @UseInterceptors(prismaClientHandler, ParseBigIntInterceptor)
@@ -86,5 +89,15 @@ export class CardsController {
   @Get('user/revision')
   listCardRevisions(@ActiveUser() userId: number) {
     return this.cardsService.listCardRevisions(userId);
+  }
+
+  @Get('/games/blitz')
+  CardFilter(
+    @Body() data: CardFilterDto,
+    @ActiveUser() userId: number,
+    @Query('randomResult', ParseBoolPipe) randomResult: boolean,
+    @Query('numberOfCard', ParseIntPipe) numberOfCard: number,
+  ) {
+    return this.cardsService.blitz(data, userId, randomResult, numberOfCard);
   }
 }

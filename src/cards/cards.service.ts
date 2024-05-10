@@ -1,8 +1,10 @@
 import {
   BadRequestException,
   ForbiddenException,
+  Inject,
   Injectable,
   NotFoundException,
+  forwardRef,
 } from '@nestjs/common';
 import * as moment from 'moment-timezone';
 import { CardsRepository } from './cards.repository';
@@ -10,14 +12,18 @@ import { CreateCardDto } from './dto/create-card.dto';
 import { UpdateCardDto } from './dto/update-card.dto';
 import { BoxesService } from 'src/boxes/boxes.service';
 import { BoxStep, Prisma } from '@prisma/client';
+import { FilterService } from 'src/filter/filter.service';
 import { StoreInBoxDto } from './dto/store-in-box.dto';
 import { ValidateCard } from './interfaces/validate-card.interface';
+import { CardFilterDto } from 'src/filter/dto/cards-filter.dto';
 
 @Injectable()
 export class CardsService {
   constructor(
     private readonly cardsRepository: CardsRepository,
     private readonly boxesService: BoxesService,
+    @Inject(forwardRef(() => FilterService))
+    private readonly filterService: FilterService,
   ) {}
 
   createCard(data: CreateCardDto, userId: number) {
@@ -62,6 +68,18 @@ export class CardsService {
     return this.cardsRepository.updateOne({ id }, updatedData);
   }
 
+  async findManyCardByIds(ids: number[], userId: number) {
+    const cards = await this.cardsRepository.findMany({
+      id: { in: ids },
+    });
+
+    if (!cards.every((card) => card.user_id === userId)) {
+      throw new ForbiddenException();
+    }
+
+    return cards;
+  }
+
   async deleteOneCard(id: number, userId: number) {
     await this.findOneCard(id, userId);
     return this.cardsRepository.deleteOne({ id });
@@ -72,7 +90,7 @@ export class CardsService {
   }
 
   private calculateFutureRevision(interval: number) {
-    return Number(moment().tz('Asia/Tokyo').add(interval, 'days').format('x'));
+    return Number(moment().add(interval, 'days').format('x'));
   }
 
   private calculateLastRevision() {
@@ -186,6 +204,20 @@ export class CardsService {
       Number(
         moment().subtract(subtractOneDay, 'days').startOf('day').format('x'),
       ),
+    );
+  }
+
+  blitz(
+    data: CardFilterDto,
+    userId: number,
+    randomResult: boolean,
+    numberOfCard: number,
+  ) {
+    return this.filterService.cardFilter(
+      data,
+      userId,
+      randomResult,
+      numberOfCard,
     );
   }
 }

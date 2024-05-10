@@ -4,7 +4,6 @@ import {
   ExecutionContext,
   Inject,
   Injectable,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
@@ -15,6 +14,7 @@ import appConfig from 'src/config/app.config';
 import { REQUEST_USER_KEY } from 'src/authentication/constant/user.constant';
 import { REFRESH_TOKEN_KEY } from '../decorators/refresh-token.decorator';
 import { RefreshTokenIdsStorageService } from 'src/redis/refresh-token-ids-storage.service';
+import { InvalidTokenException } from '../exception-filter/invalid-token-exception';
 
 @Injectable()
 export class AuthTokenGuard implements CanActivate {
@@ -37,7 +37,7 @@ export class AuthTokenGuard implements CanActivate {
     const extracted = this.extractTokensFromRequest(request);
 
     if (!extracted?.token) {
-      throw new UnauthorizedException();
+      throw new InvalidTokenException();
     }
 
     try {
@@ -67,7 +67,7 @@ export class AuthTokenGuard implements CanActivate {
       );
 
       if (!isRefreshTokenValid) {
-        throw new UnauthorizedException('Invalid refresh token');
+        throw new InvalidTokenException('Invalid refresh token');
       }
 
       request[REQUEST_USER_KEY] = decodedToken;
@@ -75,7 +75,7 @@ export class AuthTokenGuard implements CanActivate {
 
       return true;
     } catch {
-      throw new UnauthorizedException();
+      throw new InvalidTokenException();
     }
   }
 

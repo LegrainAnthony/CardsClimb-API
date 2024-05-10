@@ -34,7 +34,6 @@ describe('BoxService', () => {
 
     const testBox: CreateBoxDto = {
       name: 'test',
-      user: userId,
     };
     const box = await service.createBox(testBox, userId);
     boxId = box.id;
@@ -44,7 +43,6 @@ describe('BoxService', () => {
   it('/boxes (POST)', async () => {
     const createBoxDto: CreateBoxDto = {
       name: 'Another Test Box',
-      user: userId,
     };
 
     const box = await service.createBox(createBoxDto, userId);

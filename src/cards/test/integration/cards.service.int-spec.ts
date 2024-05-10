@@ -12,7 +12,7 @@ describe('CardService', () => {
   let prisma: PrismaService;
   let cardsService: CardsService;
   let cardsRepository: CardsRepository;
-  let user: User | null = null;
+  let user: User | null;
   let cardType: CardType | null = null;
 
   beforeAll(async () => {
@@ -137,7 +137,7 @@ describe('CardService', () => {
         answer: 'test',
         reference: 'HA_test1',
         card_type: { connect: { id: 1 } },
-        user: { connect: { id: user.id } },
+        user: { connect: { id: user!.id } },
         tags: {
           connect: [{ id: 1 }],
         },
@@ -158,7 +158,7 @@ describe('CardService', () => {
         ),
       ]);
 
-      const cards = await cardsService.listCardLateRevisions(user.id);
+      const cards = await cardsService.listCardLateRevisions(user!.id);
 
       expect(cards.length).toBe(1);
     });

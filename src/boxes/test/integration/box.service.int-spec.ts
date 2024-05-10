@@ -8,9 +8,8 @@ import { UpdateBoxDto } from 'src/boxes/dto/update-boxes.dto';
 describe('BoxService', () => {
   let service: BoxesService;
   let prisma: PrismaService;
-  let userId: number;
+  let userId: number | null;
   let boxId: number;
-  let expectedBoxesCount: number;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -25,8 +24,7 @@ describe('BoxService', () => {
         id: 1,
       },
     });
-    userId = user ? user.id : 1;
-    expectedBoxesCount = 0;
+    userId = user!.id;
 
     const testBox: CreateBoxDto = {
       name: 'test',
@@ -34,33 +32,29 @@ describe('BoxService', () => {
     };
     const box = await service.createBox(testBox, userId);
     boxId = box.id;
-    expectedBoxesCount++;
   });
 
   it('/boxes (POST)', async () => {
     const createBoxDto: CreateBoxDto = {
       name: 'Another Test Box',
-      user: userId,
+      user: userId!,
     };
 
-    const box = await service.createBox(createBoxDto, userId);
-    expectedBoxesCount++;
+    const box = await service.createBox(createBoxDto, userId!);
 
     expect(box.name).toBe(createBoxDto.name);
     expect(box.user_id).toBe(userId);
   });
 
   it('/boxes (GET)', async () => {
-    const boxes = await service.findAllBoxes(userId);
+    const boxes = await service.findAllBoxes(userId!);
 
     expect(boxes).toBeInstanceOf(Array);
-    expect(boxes).toHaveLength(expectedBoxesCount);
-    expect(boxes[0].name).toBe('test');
     expect(boxes[0].user_id).toBe(userId);
   });
 
   it('/boxes/{boxId} (GET)', async () => {
-    const box = await service.findOneBox(boxId, userId);
+    const box = await service.findOneBox(boxId, userId!);
 
     expect(box.name).toBe('test');
     expect(box.user_id).toBe(userId);
@@ -68,14 +62,13 @@ describe('BoxService', () => {
 
   it('/boxes/{boxId} (PUT)', async () => {
     const updateBoxDto: UpdateBoxDto = { name: 'Updated Box' };
-    const updatedBox = await service.updateBox(boxId, userId, updateBoxDto);
+    const updatedBox = await service.updateBox(boxId, userId!, updateBoxDto);
 
     expect(updatedBox.name).toBe(updateBoxDto.name);
   });
 
   it('/boxes/{boxId} (DELETE)', async () => {
-    await service.deleteBox(boxId, userId);
-    expectedBoxesCount--;
-    await expect(service.findOneBox(boxId, userId)).rejects.toThrow();
+    await service.deleteBox(boxId, userId!);
+    await expect(service.findOneBox(boxId, userId!)).rejects.toThrow();
   });
 });

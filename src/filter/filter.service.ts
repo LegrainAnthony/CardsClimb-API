@@ -166,4 +166,50 @@ export class FilterService {
 
     return filterOptionsFromConnectedUser;
   }
+
+  CardFilterProperties() {
+    const BASIC_FORMATED_OPERTION = [
+      'Est égal à',
+      'Supérieur à',
+      'Inferieur à',
+    ];
+    const BASIC_OPERATION = ['equals', 'gt', 'lt'];
+
+    return {
+      // reference : {},
+      created_at: {
+        formated_property: 'Date de création',
+        property: 'created_at',
+        formated_operation: BASIC_FORMATED_OPERTION,
+        operations: BASIC_OPERATION,
+      },
+      future_revision: {
+        formated_property: 'Prochaine révision',
+        property: 'future_revision',
+        formated_operation: BASIC_FORMATED_OPERTION,
+        operations: BASIC_OPERATION,
+      },
+      last_revision: {
+        formated_property: 'Dernière révision',
+        property: 'last_revision',
+        formated_operation: BASIC_FORMATED_OPERTION,
+        operations: BASIC_OPERATION,
+      },
+      box_id: {
+        formated_property: 'Boite',
+        property: 'box_id',
+        formated_operation: [
+          'Est dans une boite',
+          "N'est pas une boite",
+          'Contenu dans',
+        ],
+        operations: ['equals', 'in'],
+      },
+      tags: {
+        formated_property: 'Tags',
+        property: 'tags',
+        operations: ['in'],
+      },
+    };
+  }
 }

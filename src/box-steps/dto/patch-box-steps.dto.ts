@@ -4,5 +4,5 @@ export class PatchBoxStepsDto {
   @IsArray()
   @IsNotEmpty()
   @IsInt({ each: true })
-  ids: number[];
+  ids!: number[];
 }

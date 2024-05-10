@@ -131,6 +131,7 @@ export class FilterService {
     numberOfCard: number,
   ) {
     const { filterOptions } = data;
+
     const basePrismaCardQuery = this.iniatePrismaCardQuery(randomResult);
     const cleanedOptions = this.cleanFilterDatas(filterOptions, userId);
     const prismaCardQuery = this.PrismaCardQuerySeeding(

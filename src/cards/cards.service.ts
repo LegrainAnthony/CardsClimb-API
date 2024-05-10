@@ -15,6 +15,7 @@ import { BoxStep, Prisma } from '@prisma/client';
 import { FilterService } from 'src/filter/filter.service';
 import { StoreInBoxDto } from './dto/store-in-box.dto';
 import { ValidateCard } from './interfaces/validate-card.interface';
+import { CardFilterDto } from 'src/filter/dto/cards-filter.dto';
 
 @Injectable()
 export class CardsService {
@@ -203,6 +204,20 @@ export class CardsService {
       Number(
         moment().subtract(subtractOneDay, 'days').startOf('day').format('x'),
       ),
+    );
+  }
+
+  blitz(
+    data: CardFilterDto,
+    userId: number,
+    randomResult: boolean,
+    numberOfCard: number,
+  ) {
+    return this.filterService.cardFilter(
+      data,
+      userId,
+      randomResult,
+      numberOfCard,
     );
   }
 }

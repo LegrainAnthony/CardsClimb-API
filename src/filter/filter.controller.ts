@@ -18,6 +18,8 @@ import { prismaClientHandler } from 'src/common/interceptor';
 export class FilterController {
   constructor(private readonly filterService: FilterService) {}
 
+  // ! à supprimé
+
   @Get('blitz')
   CardFilter(
     @Body() data: CardFilterDto,

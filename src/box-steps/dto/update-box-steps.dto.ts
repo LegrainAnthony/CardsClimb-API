@@ -9,18 +9,18 @@ import {
 export class UpdateBoxStepsDto {
   @IsOptional()
   @IsNumber()
-  interval: number;
+  interval!: number;
 
   @IsNotEmpty()
   @IsArray()
   @IsNumber({}, { each: true })
-  ids: number[];
+  ids!: number[];
 }
 
 export class UpdateIntervalBoxStepsDto {
   @IsOptional()
   @IsInt()
-  interval: number;
+  interval!: number;
 
   // @IsOptional()
   // @IsInt()

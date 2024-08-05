@@ -37,4 +37,16 @@ export class UsersRepository {
       username: true,
     });
   }
+
+  updateOneUser(id: number, user: Prisma.UserUpdateInput) {
+    return this.prismaService.user.update({
+      where: { id },
+      data: user,
+      select: {
+        id: true,
+        email: true,
+        username: true,
+      },
+    });
+  }
 }

@@ -1,4 +1,8 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { UsersRepository } from './users.repository';
 import { UpdateUserDto } from './dto/update-user.dto';
 
@@ -14,7 +18,9 @@ export class UsersService {
     }
 
     if (user.id !== userId) {
-      throw new ForbiddenException('You do not have permission to access this user');
+      throw new ForbiddenException(
+        'You do not have permission to access this user',
+      );
     }
 
     return user;

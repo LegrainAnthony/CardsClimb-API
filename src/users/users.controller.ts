@@ -1,4 +1,11 @@
-import { Controller, Get, Param, ParseIntPipe, Patch, Body } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Body,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ActiveUser } from 'src/common/decorators';
@@ -10,11 +17,7 @@ export class UsersController {
 
   // The ParseIntPipe pipe is used to transform the id parameter from a string to a number.
   @Get(':id')
-
-  findOne(
-    @Param('id', ParseIntPipe) id: number,
-    @ActiveUser() userId: number
-  ) {
+  findOne(@Param('id', ParseIntPipe) id: number, @ActiveUser() userId: number) {
     return this.usersService.findOne(id, userId);
   }
 
@@ -26,5 +29,4 @@ export class UsersController {
   ) {
     return this.usersService.updateOneUser(id, userId, datas);
   }
-
 }

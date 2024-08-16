@@ -17,7 +17,9 @@ export async function main() {
   const boxesCollection = await boxSeeder(prisma, usersCollection);
   const boxStepsCollection = await boxStepSeeder(prisma, boxesCollection);
   const cardsCollection = await cardSeeder(prisma, cardTypesCollection, usersCollection, tagsCollection, boxesCollection, boxStepsCollection);
+
 }
+
 
 main()
   .then(async () => {

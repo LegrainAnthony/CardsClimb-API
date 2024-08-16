@@ -26,6 +26,11 @@ export const boxSeeder = async (prisma, usersCollection) =>  {
           name: 'Court terme',
           user: { connect: { id: usersCollection[1].id }},
         },
+        {
+          id: 5,
+          name: 'Long terme',
+          user : { connect: { id: usersCollection[2].id }},
+        }
       ];
     
 

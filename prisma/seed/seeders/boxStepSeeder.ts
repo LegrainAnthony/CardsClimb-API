@@ -122,34 +122,78 @@ export const boxStepSeeder = async (prisma, boxesCollection) =>  {
           order : 5
         },
         {
-          id: 22,
+          id: 20,
           interval: 0,
           box: { connect : { id : boxesCollection[3].id }},
           order : 1
         },
         {
-          id: 23,
+          id: 21,
           interval: 1,
           box: { connect : { id : boxesCollection[3].id }},
           order : 2
         },
         {
-          id: 24,
+          id: 22,
           interval: 3,
           box: { connect : { id : boxesCollection[3].id }},
           order : 3
         },
         {
-          id: 25,
+          id: 23,
           interval: 5,
           box: { connect : { id : boxesCollection[3].id }},
           order : 4
         },
         {
-          id: 26,
+          id: 24,
           interval: 7,
           box: { connect : { id : boxesCollection[3].id }},
           order : 5
+        },
+        {
+          id: 25,
+          interval: 0,
+          box: { connect : { id : boxesCollection[4].id }},
+          order : 1
+        },
+        {
+          id: 26,
+          interval: 1,
+          box: { connect : { id : boxesCollection[4].id }},
+          order : 2
+
+        },
+        {
+          id: 27,
+          interval: 3,
+          box: { connect : { id : boxesCollection[4].id }},
+          order : 3
+        },
+        {
+          id: 28,
+          interval: 7,
+          box: { connect : { id : boxesCollection[4].id }},
+          order : 4
+        },
+        {
+          id: 29,
+          interval: 21,
+          box: { connect : { id : boxesCollection[4].id }},
+          order : 5
+        },
+        {
+          id: 30,
+          interval: 30,
+          box: { connect : { id : boxesCollection[4].id }},
+          order : 6
+        },
+        {
+          id: 31,
+          interval: 90,
+          box: { connect : { id : boxesCollection[4].id }}
+          ,
+          order : 7
         },
       ]
     

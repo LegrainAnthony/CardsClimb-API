@@ -20,7 +20,7 @@ describe('UserService', () => {
   describe('create', () => {
     let userId: number;
     const userData: Prisma.UserCreateInput = {
-      email: 'test3@gmail.com',
+      email: 'test4@gmail.com',
       hashed_password: 'password',
       username: 'testuser',
     };

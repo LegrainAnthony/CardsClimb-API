@@ -18,6 +18,11 @@ export const userSeeder = async (prisma) =>  {
       username: 'Test2',
       email: 'test2@gmail.com',
       hashed_password: hashSync(password, 10)
+    },
+    {
+      username: 'JeuDessaie',
+      email: 'test3@gmail.com',
+      hashed_password: hashSync(password, 10)
     }
   ];
 

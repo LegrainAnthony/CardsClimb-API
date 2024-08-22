@@ -130,10 +130,10 @@ export class FilterService {
     randomResult: boolean,
     numberOfCard: number,
   ) {
-    const { filterOptions } = data;
+    const { filterOptions: optionsToFilter } = data;
 
     const basePrismaCardQuery = this.iniatePrismaCardQuery(randomResult);
-    const cleanedOptions = this.cleanFilterDatas(filterOptions, userId);
+    const cleanedOptions = this.cleanFilterDatas(optionsToFilter, userId);
     const prismaCardQuery = this.PrismaCardQuerySeeding(
       cleanedOptions,
       basePrismaCardQuery,
@@ -151,8 +151,8 @@ export class FilterService {
     return this.cardsService.findManyCardByIds(listOfIds, userId);
   }
 
-  cleanFilterDatas(filterOptions: filterOptions[], userId: number) {
-    const cleanedFilterOptions = filterOptions.filter(
+  cleanFilterDatas(optionsTofilter: filterOptions[], userId: number) {
+    const cleanedFilterOptions = optionsTofilter.filter(
       (option) => option.property !== 'user_id',
     );
 

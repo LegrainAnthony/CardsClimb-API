@@ -1,170 +1,145 @@
 
 //  #################################################
-//  ###########         BOX STEPS        ############
+//  ###########           BOXES          ############
 //  #################################################
 
-export const boxStepSeeder = async (prisma, boxesCollection) =>  {
-    const boxSteps = [
+import * as moment from 'moment';
+
+
+export const cardSeeder = async (prisma, cardTypesCollection, usersCollection, tagsCollection, boxesCollection, boxStepsCollection) =>  {
+    const cards = [
         {
           id: 1,
-          interval: 0,
-          box: { connect : { id : boxesCollection[0].id }},
-          order : 1
+          user_id : usersCollection[0].id,
+          reference: "Culture G #1",
+          question : "De quelle couleur est une orange",
+          answer: "Orange",
+          card_type: { connect: { id: cardTypesCollection[0].id } }
         },
         {
           id: 2,
-          interval: 1,
-          box: { connect : { id : boxesCollection[0].id }},
-          order : 2
-
+          user_id : usersCollection[0].id,
+          reference: "Culture G #2",
+          question : "Quelle est la capitale de la France",
+          answer: "Paris",
+          card_type: { connect: { id: cardTypesCollection[0].id } }
         },
         {
           id: 3,
-          interval: 3,
-          box: { connect : { id : boxesCollection[0].id }},
-          order : 3
+          user_id : usersCollection[1].id,
+          reference: "Culture G #3",
+          question : "Quelle est la couleur du cheval blanc d'Henri IV",
+          answer: "Blanc",
+          card_type: { connect: { id: cardTypesCollection[0].id } }
         },
         {
           id: 4,
-          interval: 7,
-          box: { connect : { id : boxesCollection[0].id }},
-          order : 4
+          user_id : usersCollection[1].id,
+          reference: "Histoire G #1",
+          question : "En quelle année a eu lieu la bataille de Marignan",
+          answer: "1515",
+          card_type: { connect: { id: cardTypesCollection[0].id } }
         },
         {
           id: 5,
-          interval: 21,
-          box: { connect : { id : boxesCollection[0].id }},
-          order : 5
+          user_id : usersCollection[2].id,
+          reference: "Culture G #1",
+          question : "De quelle couleur est une orange",
+          answer: "Orange",
+          future_revision: moment().format('x'),
+          ...(boxesCollection[4] && { box: { connect: { id: boxesCollection[4].id } } }),
+          ...(boxStepsCollection[26] && { boxStep: { connect: { id: boxStepsCollection[26].id } } }),
+          card_type: { connect: { id: cardTypesCollection[0].id } }
         },
         {
           id: 6,
-          interval: 30,
-          box: { connect : { id : boxesCollection[0].id }},
-          order : 6
+          user_id : usersCollection[2].id,
+          reference: "Culture G #2",
+          question : "Quelle est la capitale de la France",
+          answer: "Paris",
+          future_revision: moment().format('x'),
+          ...(boxesCollection[4] && { box: { connect: { id: boxesCollection[4].id } } }),
+          ...(boxStepsCollection[27] && { boxStep: { connect: { id: boxStepsCollection[27].id } } }),
+          card_type: { connect: { id: cardTypesCollection[0].id } }
         },
         {
           id: 7,
-          interval: 90,
-          box: { connect : { id : boxesCollection[0].id }}
-          ,
-          order : 7
+          user_id : usersCollection[2].id,
+          reference: "Culture G #3",
+          question : "Quelle est la couleur du cheval blanc d'Henri IV",
+          answer: "Blanc",
+          future_revision: moment().format('x'),
+          ...(boxesCollection[4] && { box: { connect: { id: boxesCollection[4].id } } }),
+          ...(boxStepsCollection[28] && { boxStep: { connect: { id: boxStepsCollection[28].id } } }),
+          card_type: { connect: { id: cardTypesCollection[0].id } }
         },
         {
           id: 8,
-          interval: 0,
-          box: { connect : { id : boxesCollection[2].id }},
-          order : 1
+          user_id : usersCollection[2].id,
+          reference: "Culture G #3",
+          question : "Quelle est la couleur du cheval blanc d'Henri IV",
+          answer: "Blanc",
+          future_revision: moment().add(1, 'days').format('x'),
+          ...(boxesCollection[4] && { box: { connect: { id: boxesCollection[4].id } } }),
+          ...(boxStepsCollection[28] && { boxStep: { connect: { id: boxStepsCollection[28].id } } }),
+          card_type: { connect: { id: cardTypesCollection[0].id } }
         },
         {
           id: 9,
-          interval: 1,
-          box: { connect : { id : boxesCollection[2].id }},
-          order : 2
+          user_id : usersCollection[2].id,
+          reference: "Histoire G #1",
+          question : "En quelle année a eu lieu la bataille de Marignan",
+          answer: "1515",
+          future_revision: moment().format('x'),
+          ...(boxesCollection[4] && { box: { connect: { id: boxesCollection[4].id } } }),
+          ...(boxStepsCollection[28] && { boxStep: { connect: { id: boxStepsCollection[28].id } } }),
+          card_type: { connect: { id: cardTypesCollection[0].id } }
         },
         {
           id: 10,
-          interval: 3,
-          box: { connect : { id : boxesCollection[2].id }},
-          order : 3
+          user_id : usersCollection[2].id,
+          reference: "Histoire G #1",
+          question : "En quelle année a eu lieu la bataille de Marignan",
+          answer: "1515",
+          future_revision: moment().format('x'),
+          ...(boxesCollection[4] && { box: { connect: { id: boxesCollection[4].id } } }),
+          ...(boxStepsCollection[28] && { boxStep: { connect: { id: boxStepsCollection[28].id } } }),
+          card_type: { connect: { id: cardTypesCollection[0].id } }
         },
         {
           id: 11,
-          interval: 7,
-          box: { connect : { id : boxesCollection[2].id }},
-          order : 4
+          user_id : usersCollection[2].id,
+          reference: "Histoire G #1",
+          question : "En quelle année a eu lieu la bataille de Marignan",
+          answer: "1515",
+          future_revision: moment().format('x'),
+          ...(boxesCollection[4] && { box: { connect: { id: boxesCollection[4].id } } }),
+          ...(boxStepsCollection[30] && { boxStep: { connect: { id: boxStepsCollection[30].id } } }),
+          card_type: { connect: { id: cardTypesCollection[0].id } }
         },
-        {
-          id: 12,
-          interval: 21,
-          box: { connect : { id : boxesCollection[2].id }},
-          order : 5
-        },
-        {
-          id: 13,
-          interval: 30,
-          box: { connect : { id : boxesCollection[2].id }},
-          order : 6
-        },
-        {
-          id: 14,
-          interval: 90,
-          box: { connect : { id : boxesCollection[2].id }},
-          order : 7
-        },
-        {
-          id: 15,
-          interval: 0,
-          box: { connect : { id : boxesCollection[1].id }},
-          order : 1
-        },
-        {
-          id: 16,
-          interval: 1,
-          box: { connect : { id : boxesCollection[1].id }},
-          order : 2
-        },
-        {
-          id: 17,
-          interval: 3,
-          box: { connect : { id : boxesCollection[1].id }},
-          order : 3
-        },
-        {
-          id: 18,
-          interval: 5,
-          box: { connect : { id : boxesCollection[1].id }},
-          order : 4
-        },
-        {
-          id: 19,
-          interval: 7,
-          box: { connect : { id : boxesCollection[1].id }},
-          order : 5
-        },
-        {
-          id: 22,
-          interval: 0,
-          box: { connect : { id : boxesCollection[3].id }},
-          order : 1
-        },
-        {
-          id: 23,
-          interval: 1,
-          box: { connect : { id : boxesCollection[3].id }},
-          order : 2
-        },
-        {
-          id: 24,
-          interval: 3,
-          box: { connect : { id : boxesCollection[3].id }},
-          order : 3
-        },
-        {
-          id: 25,
-          interval: 5,
-          box: { connect : { id : boxesCollection[3].id }},
-          order : 4
-        },
-        {
-          id: 26,
-          interval: 7,
-          box: { connect : { id : boxesCollection[3].id }},
-          order : 5
-        },
-      ]
+      ];
     
-      const boxStepsCollection = await prisma.$transaction(
-        boxSteps.map(boxStep =>
-          prisma.boxStep.upsert({
-            where: { id: boxStep.id },
+
+      
+    
+      const cardsCollection = await prisma.$transaction(
+        cards.map(card =>
+          prisma.card.upsert({
+            where: { id: card.id },
             update: {},
             create: {
-              interval: boxStep.interval,
-              box: boxStep.box,
-              order: boxStep.order
-            }
+              user: { connect: { id: card.user_id } },
+              card_type: card.card_type,
+              reference: card.reference,
+              question: card.question,
+              future_revision: card.future_revision ?? null,
+              ...((card.box !== undefined) && { box: card.box }),
+              ...((card.boxStep !== undefined) && { boxStep: card.boxStep }),
+              answer: card.answer
+            } 
           })
         )
       )
-  return boxStepsCollection
+
+  return cardsCollection
 }

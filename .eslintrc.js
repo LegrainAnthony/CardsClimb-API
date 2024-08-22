@@ -15,7 +15,12 @@ module.exports = {
     node: true,
     jest: true,
   },
-  ignorePatterns: ['.eslintrc.js'],
+  ignorePatterns: [
+    '.eslintrc.js',
+    // obligatory any type, pre-commit block
+    "src/common/interceptor/parseBigInt.interceptor.ts",
+    "src/filter/filter.repository.ts",
+  ],
   rules: {
     '@typescript-eslint/adjacent-overload-signatures': 'error',
     '@typescript-eslint/array-type': [

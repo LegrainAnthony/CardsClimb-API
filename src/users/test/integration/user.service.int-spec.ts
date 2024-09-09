@@ -37,7 +37,7 @@ describe('UserService', () => {
     });
 
     it('should get a user', async () => {
-      const user = await UserService.findOne(userId ,userId);
+      const user = await UserService.findOne(userId, userId);
 
       if (!user) throw new NotFoundException('User not found');
 

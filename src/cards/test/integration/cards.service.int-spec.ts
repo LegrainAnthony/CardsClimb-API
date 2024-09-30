@@ -42,6 +42,8 @@ describe('CardService', () => {
       reference: 'HA_test1',
       tagIds: [1],
       cardTypeId: 1,
+      boxId: null,
+      boxStepId: null,
     };
 
     it('/cards (Post)', async () => {

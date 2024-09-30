@@ -25,13 +25,12 @@ export class BoxStepsController {
     return this.boxStepService.createBoxStep(datas, userId);
   }
 
-  @Get(':id')
-  findOne(
-    @Param('id', ParseIntPipe) id: number,
+  @Get('list')
+  async findBoxStepsFromBox(
     @Query('boxId', ParseIntPipe) boxId: number,
     @ActiveUser() userId: number,
   ) {
-    return this.boxStepService.findOneBoxStep(id, boxId, userId);
+    return this.boxStepService.findAllBoxSteps(boxId, userId);
   }
 
   @Get('listByIds')
@@ -40,6 +39,15 @@ export class BoxStepsController {
     ids: number[],
   ) {
     await this.boxStepService.findManyByIds(ids);
+  }
+
+  @Get(':id')
+  findOne(
+    @Param('id', ParseIntPipe) id: number,
+    @Query('boxId', ParseIntPipe) boxId: number,
+    @ActiveUser() userId: number,
+  ) {
+    return this.boxStepService.findOneBoxStep(id, boxId, userId);
   }
 
   @Patch(':id')

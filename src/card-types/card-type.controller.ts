@@ -9,7 +9,7 @@ import { CardTypesService } from './card-type.services';
 import { prismaClientHandler } from 'src/common/interceptor';
 import { Public } from 'src/common/decorators/public.decorator';
 
-@Controller('cardTypes')
+@Controller('card-type')
 @UseInterceptors(prismaClientHandler)
 export class CardTypesController {
   constructor(private readonly cardTypesService: CardTypesService) {}

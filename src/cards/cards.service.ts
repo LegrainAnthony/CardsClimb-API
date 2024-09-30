@@ -26,13 +26,29 @@ export class CardsService {
     private readonly filterService: FilterService,
   ) {}
 
-  createCard(data: CreateCardDto, userId: number) {
-    const { tagIds, cardTypeId, ...rest } = data;
+  async createCard(data: CreateCardDto, userId: number) {
+    const { tagIds, cardTypeId, boxId, boxStepId, ...rest } = data;
+    let box;
+    let boxStep;
+
+    if (boxId) {
+      box = await this.boxesService.getBoxWithBoxSteps(boxId, userId);
+
+      if (box && boxStepId) {
+        boxStep = box.box_steps.find((step) => step.id === boxStepId);
+      }
+
+      if (!boxStepId) {
+        boxStep = box.box_steps[0];
+      }
+    }
 
     return this.cardsRepository.create({
       ...rest,
       user: { connect: { id: userId } },
       card_type: { connect: { id: cardTypeId } },
+      ...(box && { box: { connect: { id: box.id } } }),
+      ...(box && boxStep && { boxStep: { connect: { id: boxStep.id } } }),
       tags: {
         connect: tagIds.map((id) => {
           return { id };

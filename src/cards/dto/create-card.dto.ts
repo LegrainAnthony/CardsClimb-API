@@ -26,4 +26,12 @@ export class CreateCardDto {
   @IsNumber()
   @IsNotEmpty()
   cardTypeId!: number;
+
+  @IsNumber()
+  @IsOptional()
+  boxId!: number | null;
+
+  @IsNumber()
+  @IsOptional()
+  boxStepId!: number | null;
 }

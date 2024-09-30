@@ -15,7 +15,7 @@ export class BoxStepsService {
   async createBoxStep(datas: CreateBoxStepsDto, userId: number) {
     const { boxId, interval } = datas;
     const box = await this.boxesService.findOneBox(boxId, userId);
-    const boxSteps = await this.findAllBoxSteps(box.id);
+    const boxSteps = await this.findAllBoxSteps(box.id, userId);
     const order = boxSteps.length + 1;
     const CreateData = {
       boxId: box.id,
@@ -78,13 +78,14 @@ export class BoxStepsService {
     });
   }
 
-  findAllBoxSteps(boxId: number) {
-    return this.boxStepRepository.findAllBoxStepsForBox({ box_id: boxId });
+  async findAllBoxSteps(boxId: number, userId: number) {
+    const box = await this.boxesService.findOneBox(boxId, userId);
+    return this.boxStepRepository.findAllBoxStepsForBox({ box_id: box.id });
   }
 
   async updateOrderBoxSteps(ids: number[], boxId: number, userId: number) {
     const box = await this.boxesService.findOneBox(boxId, userId);
-    const existingBoxSteps = await this.findAllBoxSteps(box.id);
+    const existingBoxSteps = await this.findAllBoxSteps(box.id, userId);
     const existingId = this.convertBoxStepsToIds(existingBoxSteps);
     const commonIds = ids.filter((id) => existingId.includes(id));
     const modifiedId = [...new Set([...commonIds, ...existingId])];
@@ -108,7 +109,7 @@ export class BoxStepsService {
       userId,
     );
     await this.deleteOneBoxStep(boxStep.id);
-    const existingBoxSteps = await this.findAllBoxSteps(box.id);
+    const existingBoxSteps = await this.findAllBoxSteps(box.id, userId);
     const existingId = this.convertBoxStepsToIds(existingBoxSteps);
     const newOrderArray = this.setNewOrderBoxSteps(existingId);
 

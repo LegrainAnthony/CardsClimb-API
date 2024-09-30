@@ -32,6 +32,9 @@ services:
     command: sh -c "npx prisma migrate deploy && npx prisma migrate dev --name init && npm run seed &&  npm run start:dev"
     ports:
       - '${PORT}:8080'
+    volumes:
+      - ./src:/usr/src/app/src
+      - ./prisma:/usr/src/app/prisma
 
   pgadmin:
     image: dpage/pgadmin4

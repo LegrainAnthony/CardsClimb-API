@@ -87,7 +87,9 @@ export class BoxStepsRepository {
     BoxStepWhereInput: Prisma.BoxStepWhereInput,
   ): Promise<BoxStep[]> {
     return this.prismaService.boxStep.findMany({
-      where: BoxStepWhereInput,
+      where: {
+        box_id: BoxStepWhereInput.box_id,
+      },
     });
   }
 }
